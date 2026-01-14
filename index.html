@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V9.0 (TIMING OVERRIDE)</title>
+    <title>PLDE // LESSON MANAGER V9.1 (CHAR-TIMING)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -60,17 +60,8 @@
         .toggle-area { background: #f9f9f9; padding: 1rem; border: 1px dashed #ccc; margin-top: 1rem; }
 
         /* TIMING OVERRIDE BOX */
-        .timing-box {
-            background: #fff8e1; /* Light yellow to indicate advanced/caution */
-            border-color: #ffa000;
-        }
-        .calc-display {
-            font-size: 0.75rem;
-            color: #666;
-            margin-bottom: 5px;
-            display: block;
-            font-style: italic;
-        }
+        .timing-box { background: #fff8e1; border-color: #ffa000; }
+        .calc-display { font-size: 0.75rem; color: #666; margin-bottom: 5px; display: block; font-style: italic; }
 
         /* BOX STYLES */
         .box-dashed { background: #fdfdfd; border: var(--border); padding: 1.5rem; margin-bottom: 2rem; border-style: dashed; }
@@ -106,33 +97,10 @@
             color: #555;
         }
 
-        .checkbox-group {
-            display: flex;
-            gap: 1.5rem;
-            background: white;
-            padding: 0.8rem;
-            border: 2px solid #ccc;
-            flex-wrap: wrap;
-        }
-        .checkbox-group.vertical {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-transform: none;
-            font-weight: normal;
-        }
-        .helper-text {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 0.3rem;
-            display: block;
-        }
+        .checkbox-group { display: flex; gap: 1.5rem; background: white; padding: 0.8rem; border: 2px solid #ccc; flex-wrap: wrap; }
+        .checkbox-group.vertical { flex-direction: column; gap: 0.5rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; text-transform: none; font-weight: normal; }
+        .helper-text { font-size: 0.75rem; color: #666; margin-top: 0.3rem; display: block; }
 
         .status-badge { display: inline-block; padding: 2px 5px; font-size: 0.8rem; border: 1px solid #ccc; margin-top: 5px; background: #fff; }
 
@@ -198,7 +166,7 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V9.0</h1>
+        <h1>PLDE // LESSON MANAGER V9.1</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
@@ -314,6 +282,7 @@
                             <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall (Step 5)</label>
                             <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
                             <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
+                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay"> Auto-Play Trigger Audio</label>
                         </div>
                     </div>
@@ -548,14 +517,11 @@
     function populateFormFromData(data) {
         if(data.meta) {
             document.getElementById('meta-title').value = data.meta.title || "";
-            // Language Dropdowns
             const nDrop = document.getElementById('meta-native');
             if([...nDrop.options].some(o => o.value === data.meta.native_language)) nDrop.value = data.meta.native_language;
-            
             const tDrop = document.getElementById('meta-target');
             if([...tDrop.options].some(o => o.value === data.meta.target_language)) tDrop.value = data.meta.target_language;
 
-            // Level
             if(data.meta.level) {
                 let lvl = data.meta.level.replace(/level/gi, '').trim().toUpperCase();
                 if(document.querySelector(`#meta-level option[value='${lvl}']`)) {
@@ -565,23 +531,20 @@
                 }
             }
 
-            // DIRECTOR MODE SETTINGS
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
             document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
 
-            // LOOP CONFIG (V8 AUDIO MATCH)
             const p = data.meta.phases || { recognition:true, reorder:true, production:true, recall:true, final_boss:true };
             document.getElementById('phase-recog').checked = !!p.recognition;
-            document.getElementById('phase-audio-match').checked = !!p.audio_match; // V8
+            document.getElementById('phase-audio-match').checked = !!p.audio_match;
             document.getElementById('phase-reorder').checked = !!p.reorder;
             document.getElementById('phase-prod').checked = !!p.production;
             document.getElementById('phase-recall').checked = !!p.recall;
             document.getElementById('phase-boss').checked = !!p.final_boss;
             document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
 
-            // Advanced
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
             document.getElementById('meta-random').checked = !!data.meta.randomize;
             document.getElementById('meta-interval').value = data.meta.cumulative_interval || 3;
@@ -606,7 +569,6 @@
                     card.querySelector('.input-distractors').value = distractors;
                 }
 
-                // Restore file URL state
                 if(link.trigger.audio_url && link.trigger.audio_url !== "placeholder") {
                     card.querySelector('.f-t-aud').dataset.existing = link.trigger.audio_url;
                     card.querySelector('.status-t-aud').innerHTML = "✅ Saved"; card.querySelector('.status-t-aud').classList.remove('hidden');
@@ -622,6 +584,44 @@
             });
         }
         updateLinkNumbers();
+    }
+
+    // --- TIMING LOGIC V9.1 (Character-Based) ---
+    function calcBaseTimes(text) {
+        if (!text) return { reorder: 5, prod: 7, recall: 5 };
+        
+        const charCount = text.length;
+        const wordCount = text.trim().split(/\s+/).length;
+
+        // Formula A: Reorder
+        let t_reorder;
+        if (wordCount === 1) {
+            t_reorder = 5 + (charCount * 1.2);
+        } else {
+            t_reorder = 5 + (wordCount * 1.5) + (charCount * 0.1);
+        }
+
+        // Formula B: Production (Typing Speed ~120 CPM buffer)
+        const t_prod = 5 + (charCount * 0.5);
+
+        // Formula C: Recall (Mental processing speed)
+        const t_recall = 4 + (charCount * 0.25);
+
+        return {
+            reorder: Math.min(90, t_reorder),
+            prod: Math.min(90, t_prod),
+            recall: Math.min(90, t_recall)
+        };
+    }
+
+    function updateCardTiming(uid) {
+        const card = document.getElementById(`link-${uid}`);
+        if(!card) return;
+        const text = card.querySelector('.input-response').value.trim();
+        const base = calcBaseTimes(text);
+        document.getElementById(`base-reorder-${uid}`).innerText = `Base: ${Math.round(base.reorder)}s`;
+        document.getElementById(`base-prod-${uid}`).innerText = `Base: ${Math.round(base.prod)}s`;
+        document.getElementById(`base-recall-${uid}`).innerText = `Base: ${Math.round(base.recall)}s`;
     }
 
     // --- AI PROMPT ---
@@ -750,7 +750,6 @@ VALIDATION:
         const card = document.createElement('div');
         card.className = 'card';
         const uid = Date.now() + Math.random().toString(36).substr(2, 5);
-        // We use 'link-N' format logic simply by variable for unique ID referencing in toggle
         const linkId = `link-${uid}`;
         card.id = linkId;
         
@@ -796,31 +795,6 @@ VALIDATION:
         `;
         container.appendChild(card);
         updateLinkNumbers();
-    }
-
-    // --- TIMING LOGIC (V9) ---
-    function calcBaseTimes(text) {
-        if (!text) return { reorder: 5, prod: 7, recall: 5 };
-        const wc = text.split(/\s+/).length;
-        // Logic must match publishLesson base logic
-        return {
-            reorder: Math.min(60, 5 + (wc * 2.5)),
-            prod: Math.min(90, 7 + (wc * 3)),
-            recall: Math.min(60, 5 + (wc * 2.5))
-        };
-    }
-
-    function updateCardTiming(uid) {
-        // Find the card by ID (link-uid)
-        const card = document.getElementById(`link-${uid}`);
-        if(!card) return;
-        
-        const text = card.querySelector('.input-response').value.trim();
-        const base = calcBaseTimes(text);
-        
-        document.getElementById(`base-reorder-${uid}`).innerText = `Base: ${Math.round(base.reorder)}s`;
-        document.getElementById(`base-prod-${uid}`).innerText = `Base: ${Math.round(base.prod)}s`;
-        document.getElementById(`base-recall-${uid}`).innerText = `Base: ${Math.round(base.recall)}s`;
     }
 
     async function handleUpload(fileInput) {
@@ -898,23 +872,29 @@ VALIDATION:
                 const dists = disStr ? disStr.split(',').map(s=>s.trim()).filter(s=>s) : [];
                 const opts = shuffleArray([re, ...dists]);
                 
-                // --- TIMING LOGIC V9 (Base + Offset) ---
-                const wc = re.split(/\s+/).length;
+                // --- TIMING LOGIC V9.1 (Character-Based) ---
+                const charCount = re.length;
+                const wc = re.trim().split(/\s+/).length;
                 
-                // 1. Calculate Base
-                const baseReorder = Math.min(60, 5 + (wc * 2.5));
-                const baseProd = Math.min(90, 7 + (wc * 3));
-                const baseRecall = Math.min(60, 5 + (wc * 2.5));
+                // 1. Calculate Base (Using new formulas)
+                let baseReorder;
+                if (wc === 1) {
+                    baseReorder = 5 + (charCount * 1.2);
+                } else {
+                    baseReorder = 5 + (wc * 1.5) + (charCount * 0.1);
+                }
+                const baseProd = 5 + (charCount * 0.5);
+                const baseRecall = 4 + (charCount * 0.25);
 
                 // 2. Get Offsets
                 const offReorder = parseInt(c.querySelector('.offset-reorder').value) || 0;
                 const offProd = parseInt(c.querySelector('.offset-prod').value) || 0;
                 const offRecall = parseInt(c.querySelector('.offset-recall').value) || 0;
 
-                // 3. Apply & Clamp (Min 3s)
-                const t_reorder = Math.max(3, Math.round(baseReorder + offReorder));
-                const t_type = Math.max(3, Math.round(baseProd + offProd));
-                const t_recall = Math.max(3, Math.round(baseRecall + offRecall));
+                // 3. Apply Offset, Round, & Clamp (Min 3s, Max 90s)
+                const t_reorder = Math.max(3, Math.min(90, Math.round(baseReorder + offReorder)));
+                const t_type = Math.max(3, Math.min(90, Math.round(baseProd + offProd)));
+                const t_recall = Math.max(3, Math.min(90, Math.round(baseRecall + offRecall)));
 
                 // --- STEP GENERATION (STRICT ORDER) ---
                 let steps = {};
