@@ -588,29 +588,28 @@
 
     // --- TIMING LOGIC V9.1 (Character-Based) ---
     function calcBaseTimes(text) {
-        if (!text) return { reorder: 5, prod: 7, recall: 5 };
+        if (!text) return { reorder: 5, prod: 5, recall: 5 };
         
         const charCount = text.length;
         const wordCount = text.trim().split(/\s+/).length;
 
-        // Formula A: Reorder
-        let t_reorder;
-        if (wordCount === 1) {
-            t_reorder = 5 + (charCount * 1.2);
-        } else {
-            t_reorder = 5 + (wordCount * 1.5) + (charCount * 0.1);
-        }
+        // Formula A: Reorder (Mouse/Click)
+        // Logic: 2s buffer + 1.5s per word, with 1.2x safety margin
+        const rawReorder = (2 + (wordCount * 1.5)) * 1.2;
 
-        // Formula B: Production (Typing Speed ~120 CPM buffer)
-        const t_prod = 5 + (charCount * 0.5);
+        // Formula B: Production (Typing - 40 WPM)
+        // Logic: 2s buffer + 0.3s per char, with 1.2x safety margin
+        const rawProd = (2 + (charCount * 0.3)) * 1.2;
 
-        // Formula C: Recall (Mental processing speed)
-        const t_recall = 4 + (charCount * 0.25);
+        // Formula C: Recall (Speaking/Thinking)
+        // Logic: 2s buffer + 0.2s per char, with 1.2x safety margin
+        const rawRecall = (2 + (charCount * 0.2)) * 1.2;
 
+        // Apply Caps (Min 5s, Max 60s) & Round
         return {
-            reorder: Math.min(90, t_reorder),
-            prod: Math.min(90, t_prod),
-            recall: Math.min(90, t_recall)
+            reorder: Math.max(5, Math.min(60, Math.round(rawReorder))),
+            prod: Math.max(5, Math.min(60, Math.round(rawProd))),
+            recall: Math.max(5, Math.min(60, Math.round(rawRecall)))
         };
     }
 
@@ -876,30 +875,30 @@ VALIDATION:
                 const charCount = re.length;
                 const wc = re.trim().split(/\s+/).length;
                 
-                // 1. Calculate Base (Using new formulas)
-                let baseReorder;
-                if (wc === 1) {
-                    baseReorder = 5 + (charCount * 1.2);
-                } else {
-                    baseReorder = 5 + (wc * 1.5) + (charCount * 0.1);
-                }
-                const baseProd = 5 + (charCount * 0.5);
-                const baseRecall = 4 + (charCount * 0.25);
+                // 1. Calculate Base Times (Raw)
+                // Reorder: 1.5s per word click
+                const baseReorder = (2 + (wc * 1.5)) * 1.2;
+                
+                // Production: 0.3s per char (Typing)
+                const baseProd = (2 + (charCount * 0.3)) * 1.2;
+                
+                // Recall: 0.2s per char (Speaking)
+                const baseRecall = (2 + (charCount * 0.2)) * 1.2;
 
-                // 2. Get Offsets
+                // 2. Get Manual Offsets
                 const offReorder = parseInt(c.querySelector('.offset-reorder').value) || 0;
                 const offProd = parseInt(c.querySelector('.offset-prod').value) || 0;
                 const offRecall = parseInt(c.querySelector('.offset-recall').value) || 0;
 
-                // 3. Apply Offset, Round, & Clamp (Min 3s, Max 90s)
-                const t_reorder = Math.max(3, Math.min(90, Math.round(baseReorder + offReorder)));
-                const t_type = Math.max(3, Math.min(90, Math.round(baseProd + offProd)));
-                const t_recall = Math.max(3, Math.min(90, Math.round(baseRecall + offRecall)));
+                // 3. Apply Offset, Round, & Clamp (Min 5s, Max 60s)
+                const t_reorder = Math.max(5, Math.min(60, Math.round(baseReorder + offReorder)));
+                const t_type = Math.max(5, Math.min(60, Math.round(baseProd + offProd)));
+                const t_recall = Math.max(5, Math.min(60, Math.round(baseRecall + offRecall)));
 
                 // --- STEP GENERATION (STRICT ORDER) ---
                 let steps = {};
 
-                // 1. Model (Always included)
+                // 1. Model
                 steps["1_model"] = { 
                     type: "imprint", 
                     display: ["trigger", "response", "translation", "phonetic", "image"] 
@@ -909,12 +908,12 @@ VALIDATION:
                 if(phases.recognition) {
                     steps["2_recognition"] = { 
                         type: "multiple_choice", 
-                        time_limit: 10, 
+                        time_limit: 10, // Fixed 10s for reading multiple options
                         options: opts 
                     };
                 }
                 
-                // 2.5. Audio Match (Inserted strictly here)
+                // 2.5. Audio Match
                 if(phases.audio_match) {
                     steps["2_5_audio_match"] = { 
                         type: "audio_match", 
@@ -931,7 +930,7 @@ VALIDATION:
                     };
                 }
 
-                // 4. Production
+                // 4. Production (Typing)
                 if(phases.production) {
                     steps["4_production"] = { 
                         type: "input_strict", 
@@ -940,7 +939,7 @@ VALIDATION:
                     };
                 }
 
-                // 5. Recall
+                // 5. Recall (Thinking)
                 if(phases.recall) {
                     steps["5_timed_recall"] = { 
                         type: "input_strict", 
