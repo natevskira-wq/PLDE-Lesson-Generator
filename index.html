@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V9.2 (40 WPM)</title>
+    <title>PLDE // LESSON MANAGER V10.1 (FIXED)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -12,6 +12,7 @@
             --bg: #ffffff;
             --fg: #1a1a1a;
             --accent: #0000ff;
+            --danger: #ff0000;
             --border: 3px solid var(--fg);
             --font: 'Courier New', Courier, monospace;
         }
@@ -55,6 +56,7 @@
 
         .btn-delete { background: #ff4444; color: white; padding: 0.4rem 0.8rem; float: right; cursor: pointer; border: none; }
         
+        /* CARD STYLES */
         .card { border: var(--border); padding: 1.5rem; margin-bottom: 2rem; background: #fff; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
         .toggle-area { background: #f9f9f9; padding: 1rem; border: 1px dashed #ccc; margin-top: 1rem; }
@@ -65,7 +67,6 @@
 
         /* BOX STYLES */
         .box-dashed { background: #fdfdfd; border: var(--border); padding: 1.5rem; margin-bottom: 2rem; border-style: dashed; }
-        .manager-box { border-color: #00aa00; background: #eeffee; }
         .ai-box { border-color: var(--accent); background: #eef; }
         
         /* DIRECTOR CONSOLE STYLES */
@@ -126,6 +127,11 @@
         .footer-btn-outline { background: transparent; color: var(--fg); border-color: var(--fg); }
         .footer-btn-outline:hover { background: #f0f0f0; }
 
+        /* PRESET BUTTONS */
+        .preset-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed #ccc; align-items: center; }
+        .btn-preset { font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid var(--fg); background: white; cursor: pointer; text-transform: uppercase; }
+        .btn-preset:hover { background: var(--fg); color: white; }
+
         /* LOADING OVERLAY */
         #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .loader { width: 50px; height: 50px; border: 5px solid var(--fg); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -150,6 +156,9 @@
         .lesson-card:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
         .lesson-language { font-size: 1.2rem; font-weight: bold; }
         .lesson-meta { font-size: 0.8rem; color: #666; margin-bottom: 0.5rem; }
+        .lesson-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
+        .btn-edit { background: var(--fg); color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.8rem; flex: 1; }
+        .btn-delete-card { background: var(--danger); color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.8rem; }
         .edit-mode-container { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
         .btn-clear { background: #ff4444; color: white; border: none; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; }
         .search-controls { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 1rem; margin-bottom: 1.5rem; }
@@ -166,7 +175,7 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V9.2</h1>
+        <h1>PLDE // LESSON MANAGER V10.1</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
@@ -186,8 +195,12 @@
                 <div class="col">
                     <textarea id="ai-input" rows="1" placeholder="Paste JSON from AI here..."></textarea>
                 </div>
-                <div class="col" style="flex: 0 0 150px;">
-                    <button class="btn full-width" onclick="importJson()">⚡ LOAD DATA</button>
+                <!-- CLEAR BUTTON -->
+                <div class="col" style="flex: 0 0 100px;">
+                    <button class="btn-outline full-width" onclick="clearAiInput()">🧹 CLEAR</button>
+                </div>
+                <div class="col" style="flex: 0 0 100px;">
+                    <button class="btn full-width" onclick="importJson()">⚡ PARSE</button>
                 </div>
             </div>
         </div>
@@ -255,6 +268,14 @@
 
             <!-- DIRECTOR CONSOLE -->
             <div id="director-console" class="director-box hidden">
+                <!-- PRESETS ROW -->
+                <div class="preset-row">
+                    <span style="font-weight:bold; font-size:0.8rem; margin-right:10px;">QUICK PRESETS:</span>
+                    <button class="btn-preset" onclick="applyPreset('standard')">Standard</button>
+                    <button class="btn-preset" onclick="applyPreset('audio')">Audio Drill</button>
+                    <button class="btn-preset" onclick="applyPreset('reading')">Reading Only</button>
+                </div>
+
                 <div class="row">
                     <!-- COLUMN 1: DISPLAY & VOICE -->
                     <div class="col">
@@ -281,8 +302,10 @@
                             <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production (Step 4)</label>
                             <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall (Step 5)</label>
                             <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
-                            <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
                             
+                            <!-- NEW: CUMULATIVE & AUTO-PLAY -->
+                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Enable Cumulative Review</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay"> Auto-Play Trigger Audio</label>
                         </div>
                     </div>
@@ -295,7 +318,7 @@
                             <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Links</label>
                         </div>
                         <div style="margin-top:1rem;">
-                            <label>Interval</label>
+                            <label>Cumulative Interval</label>
                             <input type="number" id="meta-interval" value="3">
                         </div>
                     </div>
@@ -478,7 +501,10 @@
                 <div class="lesson-language">${l.native.split('-')[1]} → ${l.target.split('-')[1]}</div>
                 <div class="lesson-meta">${l.level}</div>
                 <div style="font-weight:bold; margin-bottom:0.5rem;">${l.title}</div>
-                <button class="btn" style="width:100%; font-size:0.8rem;" onclick="loadLessonFromCard('${l.id}')">✏️ EDIT</button>
+                <div class="lesson-actions">
+                    <button class="btn-edit" onclick="loadLessonFromCard('${l.id}')">✏️ EDIT</button>
+                    <button class="btn-delete-card" onclick="deleteLesson('${l.id}')">🗑️</button>
+                </div>
             `;
             grid.appendChild(card);
         });
@@ -502,6 +528,30 @@
         } catch(e) { alert(e.message); } finally { overlay.classList.add('hidden'); }
     }
 
+    async function deleteLesson(id) {
+        if(!confirm("⚠️ ARE YOU SURE?\n\nThis will permanently delete this lesson from the database. This cannot be undone.")) return;
+
+        const overlay = document.getElementById('overlay');
+        overlay.classList.remove('hidden');
+        document.getElementById('overlay-text').innerText = "DELETING...";
+
+        const { error } = await client.from('lessons').delete().eq('id', id);
+        
+        overlay.classList.add('hidden');
+        if(error) {
+            alert("Error deleting: " + error.message);
+        } else {
+            alert("Lesson deleted successfully.");
+            await loadAllLessons(); // Refresh list data
+            searchLessons(); // Refresh UI
+            
+            // If we deleted the currently loaded lesson, clear the form
+            if(currentEditId === id) {
+                clearLoadedLesson();
+            }
+        }
+    }
+
     function clearLoadedLesson() {
         if (confirm("Reset form?")) {
             currentEditId = null;
@@ -511,6 +561,45 @@
             document.getElementById('links-container').innerHTML = '';
             addLink();
         }
+    }
+
+    // --- AI STATION TOOLS ---
+    function clearAiInput() {
+        document.getElementById('ai-input').value = "";
+    }
+
+    // --- PRESETS LOGIC ---
+    function applyPreset(type) {
+        // Reset defaults first
+        document.getElementById('meta-show-text').checked = true;
+        document.getElementById('meta-show-trans').checked = false;
+        document.getElementById('meta-show-phon').checked = false;
+        document.getElementById('phase-recog').checked = true;
+        document.getElementById('phase-audio-match').checked = false;
+        document.getElementById('phase-reorder').checked = true;
+        document.getElementById('phase-prod').checked = true;
+        document.getElementById('phase-recall').checked = true;
+        document.getElementById('phase-boss').checked = true;
+        document.getElementById('phase-cumulative').checked = true;
+        document.getElementById('meta-autoplay').checked = false;
+
+        if (type === 'standard') {
+            document.getElementById('phase-audio-match').checked = true; // Added V8 feature
+        }
+        else if (type === 'audio') {
+            document.getElementById('meta-show-text').checked = false; // Hide text
+            document.getElementById('phase-audio-match').checked = true; // Enable listening
+            document.getElementById('phase-reorder').checked = false; // Disable text reorder
+            document.getElementById('meta-autoplay').checked = true; // Enable autoplay
+        }
+        else if (type === 'reading') {
+            document.getElementById('phase-audio-match').checked = false;
+            document.getElementById('phase-prod').checked = false; // No typing
+            document.getElementById('phase-recall').checked = false; // No recall
+            document.getElementById('phase-boss').checked = false; // No boss
+        }
+        
+        alert("Preset '" + type.toUpperCase() + "' applied!");
     }
 
     // --- FORM POPULATION (AI & EDIT) ---
@@ -540,14 +629,15 @@
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
             document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
 
-            // LOOP CONFIG (V8 AUDIO MATCH)
-            const p = data.meta.phases || { recognition:true, reorder:true, production:true, recall:true, final_boss:true };
+            // LOOP CONFIG (V10)
+            const p = data.meta.phases || { recognition:true, reorder:true, production:true, recall:true, final_boss:true, cumulative:true };
             document.getElementById('phase-recog').checked = !!p.recognition;
-            document.getElementById('phase-audio-match').checked = !!p.audio_match; // V8
+            document.getElementById('phase-audio-match').checked = !!p.audio_match; 
             document.getElementById('phase-reorder').checked = !!p.reorder;
             document.getElementById('phase-prod').checked = !!p.production;
             document.getElementById('phase-recall').checked = !!p.recall;
             document.getElementById('phase-boss').checked = !!p.final_boss;
+            document.getElementById('phase-cumulative').checked = p.cumulative !== false; // Default true
             document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
 
             // Advanced
@@ -828,7 +918,8 @@ VALIDATION:
                 reorder: document.getElementById('phase-reorder').checked,
                 production: document.getElementById('phase-prod').checked,
                 recall: document.getElementById('phase-recall').checked,
-                final_boss: document.getElementById('phase-boss').checked
+                final_boss: document.getElementById('phase-boss').checked,
+                cumulative: document.getElementById('phase-cumulative').checked
             };
 
             const meta = {
@@ -920,7 +1011,7 @@ VALIDATION:
                     };
                 }
                 
-                // 2.5. Audio Match
+                // 2.5. Audio Match (Inserted strictly here)
                 if(phases.audio_match) {
                     steps["2_5_audio_match"] = { 
                         type: "audio_match", 
