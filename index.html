@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V9.1 (CHAR-TIMING)</title>
+    <title>PLDE // LESSON MANAGER V9.2 (40 WPM)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -166,7 +166,7 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V9.1</h1>
+        <h1>PLDE // LESSON MANAGER V9.2</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
@@ -517,11 +517,14 @@
     function populateFormFromData(data) {
         if(data.meta) {
             document.getElementById('meta-title').value = data.meta.title || "";
+            // Language Dropdowns
             const nDrop = document.getElementById('meta-native');
             if([...nDrop.options].some(o => o.value === data.meta.native_language)) nDrop.value = data.meta.native_language;
+            
             const tDrop = document.getElementById('meta-target');
             if([...tDrop.options].some(o => o.value === data.meta.target_language)) tDrop.value = data.meta.target_language;
 
+            // Level
             if(data.meta.level) {
                 let lvl = data.meta.level.replace(/level/gi, '').trim().toUpperCase();
                 if(document.querySelector(`#meta-level option[value='${lvl}']`)) {
@@ -531,20 +534,23 @@
                 }
             }
 
+            // DIRECTOR MODE SETTINGS
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
             document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
 
+            // LOOP CONFIG (V8 AUDIO MATCH)
             const p = data.meta.phases || { recognition:true, reorder:true, production:true, recall:true, final_boss:true };
             document.getElementById('phase-recog').checked = !!p.recognition;
-            document.getElementById('phase-audio-match').checked = !!p.audio_match;
+            document.getElementById('phase-audio-match').checked = !!p.audio_match; // V8
             document.getElementById('phase-reorder').checked = !!p.reorder;
             document.getElementById('phase-prod').checked = !!p.production;
             document.getElementById('phase-recall').checked = !!p.recall;
             document.getElementById('phase-boss').checked = !!p.final_boss;
             document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
 
+            // Advanced
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
             document.getElementById('meta-random').checked = !!data.meta.randomize;
             document.getElementById('meta-interval').value = data.meta.cumulative_interval || 3;
@@ -569,6 +575,7 @@
                     card.querySelector('.input-distractors').value = distractors;
                 }
 
+                // Restore file URL state
                 if(link.trigger.audio_url && link.trigger.audio_url !== "placeholder") {
                     card.querySelector('.f-t-aud').dataset.existing = link.trigger.audio_url;
                     card.querySelector('.status-t-aud').innerHTML = "✅ Saved"; card.querySelector('.status-t-aud').classList.remove('hidden');
@@ -586,7 +593,7 @@
         updateLinkNumbers();
     }
 
-    // --- TIMING LOGIC V9.1 (Character-Based) ---
+    // --- TIMING LOGIC V9.2 (40 WPM High Pressure) ---
     function calcBaseTimes(text) {
         if (!text) return { reorder: 5, prod: 5, recall: 5 };
         
@@ -871,7 +878,7 @@ VALIDATION:
                 const dists = disStr ? disStr.split(',').map(s=>s.trim()).filter(s=>s) : [];
                 const opts = shuffleArray([re, ...dists]);
                 
-                // --- TIMING LOGIC V9.1 (Character-Based) ---
+                // --- TIMING LOGIC V9.2 (40 WPM High Pressure) ---
                 const charCount = re.length;
                 const wc = re.trim().split(/\s+/).length;
                 
@@ -898,7 +905,7 @@ VALIDATION:
                 // --- STEP GENERATION (STRICT ORDER) ---
                 let steps = {};
 
-                // 1. Model
+                // 1. Model (Always included)
                 steps["1_model"] = { 
                     type: "imprint", 
                     display: ["trigger", "response", "translation", "phonetic", "image"] 
