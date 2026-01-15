@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V10.1 (FIXED)</title>
+    <title>PLDE // LESSON MANAGER V10.2 (PRESET FIX)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -175,7 +175,7 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V10.1</h1>
+        <h1>PLDE // LESSON MANAGER V10.2</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
@@ -303,7 +303,7 @@
                             <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall (Step 5)</label>
                             <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
                             
-                            <!-- NEW: CUMULATIVE & AUTO-PLAY -->
+                            <!-- CUMULATIVE & AUTO-PLAY -->
                             <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Enable Cumulative Review</label>
                             <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay"> Auto-Play Trigger Audio</label>
@@ -442,13 +442,68 @@
         if (pageId === 'browser-page') document.getElementById('lesson-grid').innerHTML = '';
     }
 
-    // --- INITIAL LOAD ---
     window.onload = async function() { 
         if(client) await loadAllLessons();
         if (document.querySelectorAll('.card').length === 0) addLink();
     };
 
-    // --- LESSON BROWSER LOGIC ---
+    // --- AI STATION TOOLS ---
+    function clearAiInput() {
+        document.getElementById('ai-input').value = "";
+    }
+
+    // --- PRESETS LOGIC (FIXED) ---
+    function applyPreset(type) {
+        // Reset to Standard First
+        document.getElementById('meta-show-text').checked = true;
+        document.getElementById('meta-show-trans').checked = false;
+        document.getElementById('meta-show-phon').checked = false;
+        document.getElementById('meta-threshold').value = 0.7;
+
+        document.getElementById('phase-recog').checked = true;
+        document.getElementById('phase-audio-match').checked = false;
+        document.getElementById('phase-reorder').checked = true;
+        document.getElementById('phase-prod').checked = true;
+        document.getElementById('phase-recall').checked = true;
+        document.getElementById('phase-cumulative').checked = true;
+        document.getElementById('phase-boss').checked = true;
+        document.getElementById('meta-autoplay').checked = false;
+
+        document.getElementById('meta-strict').checked = true;
+        document.getElementById('meta-random').checked = false;
+        document.getElementById('meta-interval').value = 3;
+
+        if (type === 'standard') {
+            document.getElementById('phase-audio-match').checked = true; // Enable Audio Match
+        }
+        else if (type === 'audio') {
+            // MATCH IMAGE EXACTLY
+            document.getElementById('meta-show-text').checked = true; // Checked in image
+            document.getElementById('meta-threshold').value = 1.0;    // Strict 1
+            
+            document.getElementById('phase-recog').checked = false;
+            document.getElementById('phase-audio-match').checked = false;
+            document.getElementById('phase-reorder').checked = false;
+            document.getElementById('phase-prod').checked = true;
+            document.getElementById('phase-recall').checked = true;
+            
+            document.getElementById('phase-cumulative').checked = true;
+            document.getElementById('phase-boss').checked = true;
+            document.getElementById('meta-autoplay').checked = true;
+        }
+        else if (type === 'reading') {
+            document.getElementById('phase-recog').checked = true;
+            document.getElementById('phase-audio-match').checked = false;
+            document.getElementById('phase-reorder').checked = false;
+            document.getElementById('phase-prod').checked = false; // No typing
+            document.getElementById('phase-recall').checked = false; // No recall
+            document.getElementById('phase-boss').checked = false;
+        }
+        
+        alert("Preset '" + type.toUpperCase() + "' applied!");
+    }
+
+    // --- EXISTING LOGIC ---
     async function loadAllLessons() {
         try {
             const { data, error } = await client.from('lessons').select('id, title, created_at, content').order('created_at', { ascending: false });
@@ -486,7 +541,6 @@
             return;
         }
 
-        // Sort by Title/Level properly including micro-levels
         filtered.sort((a, b) => {
             const levelOrder = ['A1.1', 'A1.2', 'A2.1', 'A2.2', 'B1.1', 'B1.2', 'B2.1', 'B2.2', 'C1', 'C2'];
             const idxA = levelOrder.indexOf(a.level);
@@ -563,57 +617,14 @@
         }
     }
 
-    // --- AI STATION TOOLS ---
-    function clearAiInput() {
-        document.getElementById('ai-input').value = "";
-    }
-
-    // --- PRESETS LOGIC ---
-    function applyPreset(type) {
-        // Reset defaults first
-        document.getElementById('meta-show-text').checked = true;
-        document.getElementById('meta-show-trans').checked = false;
-        document.getElementById('meta-show-phon').checked = false;
-        document.getElementById('phase-recog').checked = true;
-        document.getElementById('phase-audio-match').checked = false;
-        document.getElementById('phase-reorder').checked = true;
-        document.getElementById('phase-prod').checked = true;
-        document.getElementById('phase-recall').checked = true;
-        document.getElementById('phase-boss').checked = true;
-        document.getElementById('phase-cumulative').checked = true;
-        document.getElementById('meta-autoplay').checked = false;
-
-        if (type === 'standard') {
-            document.getElementById('phase-audio-match').checked = true; // Added V8 feature
-        }
-        else if (type === 'audio') {
-            document.getElementById('meta-show-text').checked = false; // Hide text
-            document.getElementById('phase-audio-match').checked = true; // Enable listening
-            document.getElementById('phase-reorder').checked = false; // Disable text reorder
-            document.getElementById('meta-autoplay').checked = true; // Enable autoplay
-        }
-        else if (type === 'reading') {
-            document.getElementById('phase-audio-match').checked = false;
-            document.getElementById('phase-prod').checked = false; // No typing
-            document.getElementById('phase-recall').checked = false; // No recall
-            document.getElementById('phase-boss').checked = false; // No boss
-        }
-        
-        alert("Preset '" + type.toUpperCase() + "' applied!");
-    }
-
-    // --- FORM POPULATION (AI & EDIT) ---
     function populateFormFromData(data) {
         if(data.meta) {
             document.getElementById('meta-title').value = data.meta.title || "";
-            // Language Dropdowns
             const nDrop = document.getElementById('meta-native');
             if([...nDrop.options].some(o => o.value === data.meta.native_language)) nDrop.value = data.meta.native_language;
-            
             const tDrop = document.getElementById('meta-target');
             if([...tDrop.options].some(o => o.value === data.meta.target_language)) tDrop.value = data.meta.target_language;
 
-            // Level
             if(data.meta.level) {
                 let lvl = data.meta.level.replace(/level/gi, '').trim().toUpperCase();
                 if(document.querySelector(`#meta-level option[value='${lvl}']`)) {
@@ -623,13 +634,11 @@
                 }
             }
 
-            // DIRECTOR MODE SETTINGS
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
             document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
 
-            // LOOP CONFIG (V10)
             const p = data.meta.phases || { recognition:true, reorder:true, production:true, recall:true, final_boss:true, cumulative:true };
             document.getElementById('phase-recog').checked = !!p.recognition;
             document.getElementById('phase-audio-match').checked = !!p.audio_match; 
@@ -640,7 +649,6 @@
             document.getElementById('phase-cumulative').checked = p.cumulative !== false; // Default true
             document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
 
-            // Advanced
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
             document.getElementById('meta-random').checked = !!data.meta.randomize;
             document.getElementById('meta-interval').value = data.meta.cumulative_interval || 3;
@@ -656,7 +664,6 @@
                 card.querySelector('.input-translation').value = link.response.translation || "";
                 card.querySelector('.input-phonetic').value = link.response.phonetic || "";
                 
-                // Trigger auto-calc manually after setting value
                 updateCardTiming(card.id.replace('link-', ''));
 
                 if(link.steps?.['2_recognition']?.options) {
@@ -665,7 +672,6 @@
                     card.querySelector('.input-distractors').value = distractors;
                 }
 
-                // Restore file URL state
                 if(link.trigger.audio_url && link.trigger.audio_url !== "placeholder") {
                     card.querySelector('.f-t-aud').dataset.existing = link.trigger.audio_url;
                     card.querySelector('.status-t-aud').innerHTML = "✅ Saved"; card.querySelector('.status-t-aud').classList.remove('hidden');
@@ -683,26 +689,13 @@
         updateLinkNumbers();
     }
 
-    // --- TIMING LOGIC V9.2 (40 WPM High Pressure) ---
     function calcBaseTimes(text) {
         if (!text) return { reorder: 5, prod: 5, recall: 5 };
-        
         const charCount = text.length;
         const wordCount = text.trim().split(/\s+/).length;
-
-        // Formula A: Reorder (Mouse/Click)
-        // Logic: 2s buffer + 1.5s per word, with 1.2x safety margin
         const rawReorder = (2 + (wordCount * 1.5)) * 1.2;
-
-        // Formula B: Production (Typing - 40 WPM)
-        // Logic: 2s buffer + 0.3s per char, with 1.2x safety margin
         const rawProd = (2 + (charCount * 0.3)) * 1.2;
-
-        // Formula C: Recall (Speaking/Thinking)
-        // Logic: 2s buffer + 0.2s per char, with 1.2x safety margin
         const rawRecall = (2 + (charCount * 0.2)) * 1.2;
-
-        // Apply Caps (Min 5s, Max 60s) & Round
         return {
             reorder: Math.max(5, Math.min(60, Math.round(rawReorder))),
             prod: Math.max(5, Math.min(60, Math.round(rawProd))),
@@ -720,7 +713,6 @@
         document.getElementById(`base-recall-${uid}`).innerText = `Base: ${Math.round(base.recall)}s`;
     }
 
-    // --- AI PROMPT ---
     function copyAiPrompt() {
         const selectedNative = document.getElementById('meta-native').value;
         const selectedTarget = document.getElementById('meta-target').value;
@@ -836,7 +828,6 @@ VALIDATION:
         } catch(e) { alert("Invalid JSON."); }
     }
 
-    // --- UI HELPERS ---
     function updateLinkNumbers() { document.querySelectorAll('.card').forEach((c, i) => { c.querySelector('.link-label').innerText = `LINK #${i + 1}`; }); }
     function toggleId(id) { document.getElementById(id).classList.toggle('hidden'); }
     function removeThisLink(btn) { if(confirm("Delete?")) { btn.closest('.card').remove(); updateLinkNumbers(); } }
@@ -868,24 +859,11 @@ VALIDATION:
             <div id="context-${uid}" class="toggle-area hidden">
                 <div class="row"><div class="col"><label>Translation</label><input type="text" class="input-translation"></div><div class="col"><label>Phonetic / IPA</label><input type="text" class="input-phonetic"></div></div>
             </div>
-            <!-- TIMING OVERRIDE SECTION (V9) -->
             <div id="timing-${uid}" class="toggle-area hidden timing-box">
                 <div class="row">
-                    <div class="col">
-                        <label>Reorder (Offset)</label>
-                        <span id="base-reorder-${uid}" class="calc-display">Base: 5s</span>
-                        <input type="number" class="offset-reorder" value="0" placeholder="+/- Sec">
-                    </div>
-                    <div class="col">
-                        <label>Production (Offset)</label>
-                        <span id="base-prod-${uid}" class="calc-display">Base: 7s</span>
-                        <input type="number" class="offset-prod" value="0" placeholder="+/- Sec">
-                    </div>
-                    <div class="col">
-                        <label>Recall (Offset)</label>
-                        <span id="base-recall-${uid}" class="calc-display">Base: 5s</span>
-                        <input type="number" class="offset-recall" value="0" placeholder="+/- Sec">
-                    </div>
+                    <div class="col"><label>Reorder (Offset)</label><span id="base-reorder-${uid}" class="calc-display">Base: 5s</span><input type="number" class="offset-reorder" value="0" placeholder="+/- Sec"></div>
+                    <div class="col"><label>Production (Offset)</label><span id="base-prod-${uid}" class="calc-display">Base: 7s</span><input type="number" class="offset-prod" value="0" placeholder="+/- Sec"></div>
+                    <div class="col"><label>Recall (Offset)</label><span id="base-recall-${uid}" class="calc-display">Base: 5s</span><input type="number" class="offset-recall" value="0" placeholder="+/- Sec"></div>
                 </div>
             </div>
         `;
@@ -903,7 +881,6 @@ VALIDATION:
         return fileInput.dataset.existing || null;
     }
 
-    // --- PUBLISH LOGIC (FIXED STEP ORDER & VALIDATION & TIMING) ---
     async function publishLesson() {
         if(!client) return;
         const overlay = document.getElementById('overlay');
@@ -911,7 +888,6 @@ VALIDATION:
         document.getElementById('overlay-text').innerText = "PROCESSING...";
 
         try {
-            // CAPTURE PHASES
             const phases = {
                 recognition: document.getElementById('phase-recog').checked,
                 audio_match: document.getElementById('phase-audio-match').checked,
@@ -927,11 +903,8 @@ VALIDATION:
                 native_language: document.getElementById('meta-native').value,
                 target_language: document.getElementById('meta-target').value,
                 level: document.getElementById('meta-level').value,
-                
-                // Director & Loop
                 phases: phases,
                 audio_autoplay: document.getElementById('meta-autoplay').checked,
-                
                 show_text: document.getElementById('meta-show-text').checked,
                 show_translation: document.getElementById('meta-show-trans').checked,
                 show_phonetic: document.getElementById('meta-show-phon').checked,
@@ -955,96 +928,39 @@ VALIDATION:
                 
                 if(!tr || !re) throw new Error(`Link #${i+1} incomplete`);
 
-                // FILE HANDLING (Strict null safety)
                 const uImg = await handleUpload(c.querySelector('.f-t-img'));
                 const uAudT = await handleUpload(c.querySelector('.f-t-aud'));
                 const uAudR = await handleUpload(c.querySelector('.f-r-aud'));
 
-                // AUTO-PLAY VALIDATION CHECK
                 if (meta.audio_autoplay && !uAudT) {
-                    warnings.push(`Link #${i+1}: Auto-Play is ON but no Trigger Audio file found. (Will fallback to TTS)`);
+                    warnings.push(`Link #${i+1}: Auto-Play is ON but no Trigger Audio file found.`);
                 }
 
                 const disStr = c.querySelector('.input-distractors').value;
                 const dists = disStr ? disStr.split(',').map(s=>s.trim()).filter(s=>s) : [];
                 const opts = shuffleArray([re, ...dists]);
                 
-                // --- TIMING LOGIC V9.2 (40 WPM High Pressure) ---
                 const charCount = re.length;
                 const wc = re.trim().split(/\s+/).length;
-                
-                // 1. Calculate Base Times (Raw)
-                // Reorder: 1.5s per word click
                 const baseReorder = (2 + (wc * 1.5)) * 1.2;
-                
-                // Production: 0.3s per char (Typing)
                 const baseProd = (2 + (charCount * 0.3)) * 1.2;
-                
-                // Recall: 0.2s per char (Speaking)
                 const baseRecall = (2 + (charCount * 0.2)) * 1.2;
 
-                // 2. Get Manual Offsets
                 const offReorder = parseInt(c.querySelector('.offset-reorder').value) || 0;
                 const offProd = parseInt(c.querySelector('.offset-prod').value) || 0;
                 const offRecall = parseInt(c.querySelector('.offset-recall').value) || 0;
 
-                // 3. Apply Offset, Round, & Clamp (Min 5s, Max 60s)
                 const t_reorder = Math.max(5, Math.min(60, Math.round(baseReorder + offReorder)));
                 const t_type = Math.max(5, Math.min(60, Math.round(baseProd + offProd)));
                 const t_recall = Math.max(5, Math.min(60, Math.round(baseRecall + offRecall)));
 
-                // --- STEP GENERATION (STRICT ORDER) ---
                 let steps = {};
-
-                // 1. Model (Always included)
-                steps["1_model"] = { 
-                    type: "imprint", 
-                    display: ["trigger", "response", "translation", "phonetic", "image"] 
-                };
-
-                // 2. Recognition
-                if(phases.recognition) {
-                    steps["2_recognition"] = { 
-                        type: "multiple_choice", 
-                        time_limit: 10, // Fixed 10s for reading multiple options
-                        options: opts 
-                    };
-                }
-                
-                // 2.5. Audio Match (Inserted strictly here)
-                if(phases.audio_match) {
-                    steps["2_5_audio_match"] = { 
-                        type: "audio_match", 
-                        time_limit: 10, 
-                        options: opts 
-                    };
-                }
-
-                // 3. Reorder
-                if(phases.reorder) {
-                    steps["3_reorder"] = { 
-                        type: "sentence_reorder", 
-                        time_limit: t_reorder 
-                    };
-                }
-
-                // 4. Production (Typing)
-                if(phases.production) {
-                    steps["4_production"] = { 
-                        type: "input_strict", 
-                        time_limit: t_type, 
-                        display: ["trigger", "translation"] 
-                    };
-                }
-
-                // 5. Recall (Thinking)
-                if(phases.recall) {
-                    steps["5_timed_recall"] = { 
-                        type: "input_strict", 
-                        time_limit: t_recall, 
-                        display: ["trigger"] 
-                    };
-                }
+                steps["1_model"] = { type: "imprint", display: ["trigger", "response", "translation", "phonetic", "image"] };
+                if(phases.recognition) steps["2_recognition"] = { type: "multiple_choice", time_limit: 10, options: opts };
+                if(phases.audio_match) steps["2_5_audio_match"] = { type: "audio_match", time_limit: 10, options: opts };
+                if(phases.reorder) steps["3_reorder"] = { type: "sentence_reorder", time_limit: t_reorder };
+                if(phases.production) steps["4_production"] = { type: "input_strict", time_limit: t_type, display: ["trigger", "translation"] };
+                if(phases.recall) steps["5_timed_recall"] = { type: "input_strict", time_limit: t_recall, display: ["trigger"] };
 
                 links.push({
                     trigger: { text: tr, image_url: uImg, audio_url: uAudT, video_url: null },
@@ -1053,11 +969,10 @@ VALIDATION:
                 });
             }
 
-            // WARN USER IF AUTO-PLAY ISSUES EXIST
             if (warnings.length > 0) {
                 if (!confirm("⚠️ WARNING: AUDIO MISSING\n\n" + warnings.join("\n") + "\n\nContinue anyway?")) {
                     overlay.classList.add('hidden');
-                    return; // Stop publish
+                    return;
                 }
             }
 
@@ -1079,7 +994,6 @@ VALIDATION:
 
     function shuffleArray(arr) { let a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
-    // --- PRINTING LOGIC ---
     function printSection(section, isKey) {
         const title = document.getElementById('meta-title').value || "Lesson";
         const cards = document.querySelectorAll('.card');
