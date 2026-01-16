@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V10.2 (PRESET FIX)</title>
+    <title>PLDE // LESSON MANAGER V9.0 (ADVANCED CONTROLS)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -20,14 +20,13 @@
         body { background: var(--bg); color: var(--fg); font-family: var(--font); margin: 0; padding: 0; }
         
         /* PAGE CONTAINERS */
-        .page { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; min-height: calc(100vh - 70px); }
+        .page { display: none; padding: 2rem; max-width: 1000px; margin: 0 auto; min-height: calc(100vh - 70px); }
         .page.active { display: block; }
         
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .hidden { display: none !important; }
         .row { display: flex; gap: 1rem; margin-bottom: 1rem; }
         .col { flex: 1; }
-        .full-width { width: 100%; }
         
         h1 { font-size: 2rem; border-bottom: var(--border); padding-bottom: 1rem; margin-bottom: 2rem; text-transform: uppercase; }
         h3 { margin-top: 0; text-transform: uppercase; }
@@ -40,104 +39,64 @@
         .btn-outline { background: transparent; border: 2px solid var(--fg); color: var(--fg); }
         .btn-outline:hover { background: #eee; }
         
-        /* TOGGLE BUTTON STYLING */
         .btn-toggle { 
-            font-size: 0.9rem; 
-            padding: 0.6rem 1rem; 
-            border: 2px dashed var(--fg); 
-            background: #f9f9f9; 
-            cursor: pointer; 
-            width: 100%;
-            text-align: left;
-            font-weight: bold;
-            margin-top: 1rem;
+            font-size: 0.9rem; padding: 0.6rem 1rem; border: 2px dashed var(--fg); background: #f9f9f9; 
+            cursor: pointer; width: 100%; text-align: left; font-weight: bold; margin-top: 1rem;
         }
         .btn-toggle:hover { background: #eee; }
-
         .btn-delete { background: #ff4444; color: white; padding: 0.4rem 0.8rem; float: right; cursor: pointer; border: none; }
         
         /* CARD STYLES */
         .card { border: var(--border); padding: 1.5rem; margin-bottom: 2rem; background: #fff; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
         .toggle-area { background: #f9f9f9; padding: 1rem; border: 1px dashed #ccc; margin-top: 1rem; }
-
-        /* TIMING OVERRIDE BOX */
         .timing-box { background: #fff8e1; border-color: #ffa000; }
         .calc-display { font-size: 0.75rem; color: #666; margin-bottom: 5px; display: block; font-style: italic; }
 
-        /* BOX STYLES */
         .box-dashed { background: #fdfdfd; border: var(--border); padding: 1.5rem; margin-bottom: 2rem; border-style: dashed; }
         .ai-box { border-color: var(--accent); background: #eef; }
         
-        /* DIRECTOR CONSOLE STYLES */
+        /* --- DIRECTOR CONSOLE V9 (GRID LAYOUT) --- */
         .director-box {
-            background: #f0f0f0;
-            border: var(--border);
-            padding: 1.5rem;
-            margin-top: 0.5rem;
-            margin-bottom: 2rem;
-            position: relative;
+            background: #f4f4f4; border: var(--border); padding: 1.5rem; 
+            margin-top: 0.5rem; margin-bottom: 2rem; position: relative;
         }
         .director-box::before {
-            content: "🎬";
-            position: absolute;
-            top: -15px;
-            right: 20px;
-            font-size: 2rem;
-            background: var(--bg);
-            padding: 0 5px;
-            z-index: 10;
+            content: "🎬"; position: absolute; top: -15px; right: 20px; font-size: 2rem; 
+            background: var(--bg); padding: 0 5px; z-index: 10;
         }
         
-        .subsection-title {
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-bottom: 2px solid #ccc;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.2rem;
-            color: #555;
-        }
-
-        .checkbox-group { display: flex; gap: 1.5rem; background: white; padding: 0.8rem; border: 2px solid #ccc; flex-wrap: wrap; }
-        .checkbox-group.vertical { flex-direction: column; gap: 0.5rem; }
-        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; text-transform: none; font-weight: normal; }
-        .helper-text { font-size: 0.75rem; color: #666; margin-top: 0.3rem; display: block; }
+        /* FIELDSET STYLING */
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
+        
+        fieldset { border: 2px solid var(--fg); padding: 1rem; background: #fff; margin: 0; min-height: 100%; }
+        legend { font-weight: bold; background: var(--fg); color: var(--bg); padding: 0.2rem 0.5rem; text-transform: uppercase; font-size: 0.85rem; }
+        
+        .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; }
+        .helper-text { font-size: 0.75rem; color: #666; margin-top: 0.2rem; display: block; margin-left: 1.5rem; }
 
         .status-badge { display: inline-block; padding: 2px 5px; font-size: 0.8rem; border: 1px solid #ccc; margin-top: 5px; background: #fff; }
 
-        /* FOOTER BAR */
+        /* FOOTER & OVERLAY */
         .bottom-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: white; padding: 1rem;
-            border-top: var(--border);
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 0.5rem;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.05); z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 1rem; border-top: var(--border);
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; box-shadow: 0 -5px 10px rgba(0,0,0,0.05); z-index: 100;
         }
-
         .footer-btn, .footer-btn-outline {
-            padding: 0.9rem 0.5rem; 
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-            font-family: var(--font); font-size: 0.85rem; 
-            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            min-height: 44px; border: 2px solid var(--fg);
+            padding: 0.9rem 0.5rem; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: var(--font); font-size: 0.85rem; 
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 44px; border: 2px solid var(--fg);
         }
-        .footer-btn { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-        .footer-btn-outline { background: transparent; color: var(--fg); border-color: var(--fg); }
+        .footer-btn { background: var(--fg); color: var(--bg); }
+        .footer-btn-outline { background: transparent; color: var(--fg); }
         .footer-btn-outline:hover { background: #f0f0f0; }
 
-        /* PRESET BUTTONS */
-        .preset-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed #ccc; align-items: center; }
-        .btn-preset { font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid var(--fg); background: white; cursor: pointer; text-transform: uppercase; }
-        .btn-preset:hover { background: var(--fg); color: white; }
-
-        /* LOADING OVERLAY */
         #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .loader { width: 50px; height: 50px; border: 5px solid var(--fg); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* PRINT STYLES */
+        /* PRINT */
         #print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -150,7 +109,7 @@
             .recall-line { display: block; border-bottom: 1px solid black; height: 25px; margin-top: 10px; width: 100%; }
         }
 
-        /* BROWSER PAGE STYLES */
+        /* BROWSER */
         .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .lesson-card { border: 2px solid var(--fg); padding: 1.2rem; cursor: pointer; transition: transform 0.2s; background: white; }
         .lesson-card:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
@@ -163,7 +122,7 @@
         .btn-clear { background: #ff4444; color: white; border: none; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; }
         .search-controls { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 1rem; margin-bottom: 1.5rem; }
         
-        /* PRINT PAGE OPTIONS */
+        /* PRINT PAGE */
         .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .print-section { background: #f9f9f9; padding: 1.5rem; border: 2px solid var(--fg); }
         .print-buttons { display: flex; gap: 0.5rem; margin-top: 1rem; }
@@ -175,13 +134,11 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V10.2</h1>
+        <h1>PLDE // LESSON MANAGER V9</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
-            <div style="color: green; font-weight: bold;">
-                ✏️ EDITING MODE ACTIVE
-            </div>
+            <div style="color: green; font-weight: bold;">✏️ EDITING MODE ACTIVE</div>
             <button class="btn-clear" onclick="clearLoadedLesson()">CLEAR & RESET</button>
         </div>
 
@@ -195,7 +152,6 @@
                 <div class="col">
                     <textarea id="ai-input" rows="1" placeholder="Paste JSON from AI here..."></textarea>
                 </div>
-                <!-- CLEAR BUTTON -->
                 <div class="col" style="flex: 0 0 100px;">
                     <button class="btn-outline full-width" onclick="clearAiInput()">🧹 CLEAR</button>
                 </div>
@@ -249,79 +205,83 @@
                 <div class="col">
                     <label>Level</label>
                     <select id="meta-level">
-                        <option value="A1.1">A1.1</option>
-                        <option value="A1.2">A1.2</option>
-                        <option value="A2.1">A2.1</option>
-                        <option value="A2.2">A2.2</option>
-                        <option value="B1.1">B1.1</option>
-                        <option value="B1.2">B1.2</option>
-                        <option value="B2.1">B2.1</option>
-                        <option value="B2.2">B2.2</option>
-                        <option value="C1">C1</option>
-                        <option value="C2">C2</option>
+                        <option value="A1.1">A1.1</option><option value="A1.2">A1.2</option>
+                        <option value="A2.1">A2.1</option><option value="A2.2">A2.2</option>
+                        <option value="B1.1">B1.1</option><option value="B1.2">B1.2</option>
+                        <option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
+                        <option value="C1">C1</option><option value="C2">C2</option>
                     </select>
                 </div>
             </div>
 
             <!-- TOGGLE BUTTON -->
-            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & LOOP CONFIG (Toggle)</button>
+            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & AI SETTINGS (Toggle)</button>
 
-            <!-- DIRECTOR CONSOLE -->
+            <!-- DIRECTOR CONSOLE V9 (4 BOX LAYOUT) -->
             <div id="director-console" class="director-box hidden">
-                <!-- PRESETS ROW -->
-                <div class="preset-row">
-                    <span style="font-weight:bold; font-size:0.8rem; margin-right:10px;">QUICK PRESETS:</span>
-                    <button class="btn-preset" onclick="applyPreset('standard')">Standard</button>
-                    <button class="btn-preset" onclick="applyPreset('audio')">Audio Drill</button>
-                    <button class="btn-preset" onclick="applyPreset('reading')">Reading Only</button>
+                <div style="margin-bottom:1rem; border-bottom:1px dashed #ccc; padding-bottom:0.5rem;">
+                    <span style="font-size:0.8rem; font-weight:bold; margin-right:10px;">QUICK PRESETS:</span>
+                    <button style="font-size:0.7rem;" onclick="applyPreset('standard')">STANDARD</button>
+                    <button style="font-size:0.7rem;" onclick="applyPreset('audio')">AUDIO DRILL</button>
+                    <button style="font-size:0.7rem;" onclick="applyPreset('reading')">READING</button>
                 </div>
 
-                <div class="row">
-                    <!-- COLUMN 1: DISPLAY & VOICE -->
-                    <div class="col">
-                        <div class="subsection-title">PLAYER DISPLAY</div>
-                        <div class="checkbox-group vertical">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Display Trigger Text (Uncheck for Audio-Only)</label>
+                <div class="settings-grid">
+                    <!-- BOX 1: DISPLAY -->
+                    <fieldset>
+                        <legend>1. Display</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Trigger Text</label>
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-phon"> Show Phonetic</label>
-                        </div>
-                        
-                        <div style="margin-top:1rem;">
-                            <label>Voice Strictness</label>
-                            <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
-                        </div>
-                    </div>
-
-                    <!-- COLUMN 2: LOOP CONFIG -->
-                    <div class="col">
-                        <div class="subsection-title">⟳ LOOP CONFIGURATION</div>
-                        <div class="checkbox-group vertical">
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition (Step 2)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match (Step 2.5)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder (Step 3)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production (Step 4)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall (Step 5)</label>
                             <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
+                            <label class="checkbox-label" style="color:red;"><input type="checkbox" id="meta-hide-resp"> HIDE Response (TEST MODE)</label>
+                            <span class="helper-text">Hides text in Imprint step.</span>
+                        </div>
+                    </fieldset>
+
+                    <!-- BOX 2: AUDIO BEHAVIOR -->
+                    <fieldset>
+                        <legend>2. Audio Behavior</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-imprint"> Auto-Play Trigger (Imprint)</label>
+                            <span class="helper-text">Plays audio immediately on new card.</span>
                             
-                            <!-- CUMULATIVE & AUTO-PLAY -->
-                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Enable Cumulative Review</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-drill"> Auto-Play Trigger (Drills)</label>
+                            <span class="helper-text">Plays audio during exercises.</span>
+                        </div>
+                    </fieldset>
+
+                    <!-- BOX 3: ENGINE TUNING -->
+                    <fieldset>
+                        <legend>3. Engine Tuning</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Mode</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative Review</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Order</label>
+                            <div style="margin-top:0.5rem;">
+                                <label style="font-size:0.75rem;">Voice Threshold (0.1-1.0)</label>
+                                <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
+                            </div>
+                            <div style="margin-top:0.2rem;">
+                                <label style="font-size:0.75rem;">Review Interval</label>
+                                <input type="number" id="meta-interval" value="3">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- BOX 4: LOOP CONFIG -->
+                    <fieldset>
+                        <legend>4. Loop Config</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall</label>
                             <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay"> Auto-Play Trigger Audio</label>
                         </div>
-                    </div>
-                    
-                    <!-- COLUMN 3: ADVANCED -->
-                    <div class="col">
-                        <div class="subsection-title">ADVANCED</div>
-                        <div class="checkbox-group vertical">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Spelling</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Links</label>
-                        </div>
-                        <div style="margin-top:1rem;">
-                            <label>Cumulative Interval</label>
-                            <input type="number" id="meta-interval" value="3">
-                        </div>
-                    </div>
+                    </fieldset>
                 </div>
             </div>
         </div>
@@ -336,53 +296,15 @@
     </div>
 </div>
 
-<!-- LESSON BROWSER PAGE -->
+<!-- LESSON BROWSER -->
 <div id="browser-page" class="page">
     <div class="container lesson-browser-page">
         <div class="page-header"><h1>📂 LOAD LESSON</h1></div>
         <div class="search-controls">
             <input type="text" id="lesson-search" class="search-box" placeholder="Search title...">
-            <select id="filter-native" class="filter-select">
-                <option value="">Native: Any</option>
-                <option value="en-US">English</option>
-                <option value="de-DE">German</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-BR">Portuguese</option>
-                <option value="ru-RU">Russian</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="ar-EG">Arabic</option>
-            </select>
-            <select id="filter-target" class="filter-select">
-                <option value="">Target: Any</option>
-                <option value="en-US">English</option>
-                <option value="de-DE">German</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-BR">Portuguese</option>
-                <option value="ru-RU">Russian</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="ar-EG">Arabic</option>
-            </select>
-            <select id="filter-level" class="filter-select">
-                <option value="">Level: Any</option>
-                <option value="A1.1">A1.1</option>
-                <option value="A1.2">A1.2</option>
-                <option value="A2.1">A2.1</option>
-                <option value="A2.2">A2.2</option>
-                <option value="B1.1">B1.1</option>
-                <option value="B1.2">B1.2</option>
-                <option value="B2.1">B2.1</option>
-                <option value="B2.2">B2.2</option>
-                <option value="C1">C1</option>
-                <option value="C2">C2</option>
-            </select>
+            <select id="filter-native" class="filter-select"><option value="">Native: Any</option><option value="en-US">English</option></select>
+            <select id="filter-target" class="filter-select"><option value="">Target: Any</option><option value="de-DE">German</option></select>
+            <select id="filter-level" class="filter-select"><option value="">Level: Any</option><option value="A1.1">A1.1</option></select>
             <button class="btn" onclick="searchLessons()">🔍 SEARCH</button>
         </div>
         <div id="lesson-grid" class="lesson-grid"></div>
@@ -395,31 +317,17 @@
     <div class="container print-page">
         <div class="page-header"><h1>🖨️ PRINT LESSON</h1></div>
         <div class="print-options-grid">
-            <div class="print-section">
-                <h3>Part A: Match</h3>
-                <div class="print-buttons"><button class="btn-print-outline" onclick="printPartA(false)">Test</button><button class="btn-print-outline" onclick="printPartA(true)">Key</button></div>
-            </div>
-            <div class="print-section">
-                <h3>Part B: Unscramble</h3>
-                <div class="print-buttons"><button class="btn-print-outline" onclick="printPartB(false)">Test</button><button class="btn-print-outline" onclick="printPartB(true)">Key</button></div>
-            </div>
-            <div class="print-section">
-                <h3>Part C: Translate</h3>
-                <div class="print-buttons"><button class="btn-print-outline" onclick="printPartC(false)">Test</button><button class="btn-print-outline" onclick="printPartC(true)">Key</button></div>
-            </div>
-            <div class="print-section">
-                <h3>Full Test</h3>
-                <div class="print-buttons"><button class="btn" style="flex:1" onclick="printAll(false)">FULL TEST</button><button class="btn" style="flex:1" onclick="printAll(true)">FULL KEY</button></div>
-            </div>
+            <div class="print-section"><h3>Part A: Match</h3><div class="print-buttons"><button class="btn-print-outline" onclick="printPartA(false)">Test</button><button class="btn-print-outline" onclick="printPartA(true)">Key</button></div></div>
+            <div class="print-section"><h3>Part B: Unscramble</h3><div class="print-buttons"><button class="btn-print-outline" onclick="printPartB(false)">Test</button><button class="btn-print-outline" onclick="printPartB(true)">Key</button></div></div>
+            <div class="print-section"><h3>Part C: Translate</h3><div class="print-buttons"><button class="btn-print-outline" onclick="printPartC(false)">Test</button><button class="btn-print-outline" onclick="printPartC(true)">Key</button></div></div>
+            <div class="print-section"><h3>Full Test</h3><div class="print-buttons"><button class="btn" style="flex:1" onclick="printAll(false)">FULL TEST</button><button class="btn" style="flex:1" onclick="printAll(true)">FULL KEY</button></div></div>
         </div>
     </div>
 </div>
 
-<!-- PRINT AREA & LOADER -->
 <div id="print-area"></div>
 <div id="overlay" class="hidden"><div class="loader"></div><h2 id="overlay-text">WORKING...</h2></div>
 
-<!-- BOTTOM ACTIONS -->
 <div class="bottom-bar">
     <button class="footer-btn" onclick="showPage('editor-page')">/// EDITOR ///</button>
     <button class="footer-btn-outline" onclick="showPage('browser-page')">📂 LOAD</button>
@@ -435,7 +343,6 @@
     let currentEditId = null; 
     let allLessons = [];
 
-    // --- PAGE NAVIGATION ---
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
@@ -447,63 +354,7 @@
         if (document.querySelectorAll('.card').length === 0) addLink();
     };
 
-    // --- AI STATION TOOLS ---
-    function clearAiInput() {
-        document.getElementById('ai-input').value = "";
-    }
-
-    // --- PRESETS LOGIC (FIXED) ---
-    function applyPreset(type) {
-        // Reset to Standard First
-        document.getElementById('meta-show-text').checked = true;
-        document.getElementById('meta-show-trans').checked = false;
-        document.getElementById('meta-show-phon').checked = false;
-        document.getElementById('meta-threshold').value = 0.7;
-
-        document.getElementById('phase-recog').checked = true;
-        document.getElementById('phase-audio-match').checked = false;
-        document.getElementById('phase-reorder').checked = true;
-        document.getElementById('phase-prod').checked = true;
-        document.getElementById('phase-recall').checked = true;
-        document.getElementById('phase-cumulative').checked = true;
-        document.getElementById('phase-boss').checked = true;
-        document.getElementById('meta-autoplay').checked = false;
-
-        document.getElementById('meta-strict').checked = true;
-        document.getElementById('meta-random').checked = false;
-        document.getElementById('meta-interval').value = 3;
-
-        if (type === 'standard') {
-            document.getElementById('phase-audio-match').checked = true; // Enable Audio Match
-        }
-        else if (type === 'audio') {
-            // MATCH IMAGE EXACTLY
-            document.getElementById('meta-show-text').checked = true; // Checked in image
-            document.getElementById('meta-threshold').value = 1.0;    // Strict 1
-            
-            document.getElementById('phase-recog').checked = false;
-            document.getElementById('phase-audio-match').checked = false;
-            document.getElementById('phase-reorder').checked = false;
-            document.getElementById('phase-prod').checked = true;
-            document.getElementById('phase-recall').checked = true;
-            
-            document.getElementById('phase-cumulative').checked = true;
-            document.getElementById('phase-boss').checked = true;
-            document.getElementById('meta-autoplay').checked = true;
-        }
-        else if (type === 'reading') {
-            document.getElementById('phase-recog').checked = true;
-            document.getElementById('phase-audio-match').checked = false;
-            document.getElementById('phase-reorder').checked = false;
-            document.getElementById('phase-prod').checked = false; // No typing
-            document.getElementById('phase-recall').checked = false; // No recall
-            document.getElementById('phase-boss').checked = false;
-        }
-        
-        alert("Preset '" + type.toUpperCase() + "' applied!");
-    }
-
-    // --- EXISTING LOGIC ---
+    // --- LESSON BROWSER ---
     async function loadAllLessons() {
         try {
             const { data, error } = await client.from('lessons').select('id, title, created_at, content').order('created_at', { ascending: false });
@@ -517,7 +368,7 @@
                 level: l.content?.meta?.level || 'A1.1',
                 content: l.content
             }));
-        } catch(e) { console.error("Error loading lessons:", e); }
+        } catch(e) { console.error(e); }
     }
 
     function searchLessons() {
@@ -536,17 +387,9 @@
         
         const grid = document.getElementById('lesson-grid');
         grid.innerHTML = '';
-        if (filtered.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center;">No lessons found.</div>';
-            return;
-        }
+        if (filtered.length === 0) { grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center;">No lessons found.</div>'; return; }
 
-        filtered.sort((a, b) => {
-            const levelOrder = ['A1.1', 'A1.2', 'A2.1', 'A2.2', 'B1.1', 'B1.2', 'B2.1', 'B2.2', 'C1', 'C2'];
-            const idxA = levelOrder.indexOf(a.level);
-            const idxB = levelOrder.indexOf(b.level);
-            return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
-        });
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         filtered.forEach(l => {
             const card = document.createElement('div');
@@ -570,11 +413,9 @@
         try {
             const { data, error } = await client.from('lessons').select('*').eq('id', id).single();
             if(error) throw error;
-
             currentEditId = data.id;
             document.getElementById('edit-mode-container').classList.remove('hidden');
             document.getElementById('publish-btn').innerText = "/// UPDATE ///";
-
             populateFormFromData(data.content);
             document.getElementById('meta-title').value = data.title; 
             showPage('editor-page');
@@ -583,26 +424,18 @@
     }
 
     async function deleteLesson(id) {
-        if(!confirm("⚠️ ARE YOU SURE?\n\nThis will permanently delete this lesson from the database. This cannot be undone.")) return;
-
+        if(!confirm("⚠️ PERMANENTLY DELETE LESSON?")) return;
         const overlay = document.getElementById('overlay');
         overlay.classList.remove('hidden');
         document.getElementById('overlay-text').innerText = "DELETING...";
-
         const { error } = await client.from('lessons').delete().eq('id', id);
-        
         overlay.classList.add('hidden');
-        if(error) {
-            alert("Error deleting: " + error.message);
-        } else {
-            alert("Lesson deleted successfully.");
-            await loadAllLessons(); // Refresh list data
-            searchLessons(); // Refresh UI
-            
-            // If we deleted the currently loaded lesson, clear the form
-            if(currentEditId === id) {
-                clearLoadedLesson();
-            }
+        if(error) alert("Error: " + error.message);
+        else {
+            alert("Deleted.");
+            await loadAllLessons();
+            searchLessons();
+            if(currentEditId === id) clearLoadedLesson();
         }
     }
 
@@ -617,41 +450,89 @@
         }
     }
 
+    function clearAiInput() { document.getElementById('ai-input').value = ""; }
+
+    // --- PRESETS ---
+    function applyPreset(type) {
+        // Defaults
+        document.getElementById('meta-show-text').checked = true;
+        document.getElementById('meta-show-trans').checked = false;
+        document.getElementById('meta-show-phon').checked = false;
+        document.getElementById('meta-hide-resp').checked = false; // Test Mode Off
+        
+        document.getElementById('meta-autoplay-imprint').checked = false;
+        document.getElementById('meta-autoplay-drill').checked = false;
+
+        document.getElementById('phase-recog').checked = true;
+        document.getElementById('phase-audio-match').checked = false;
+        document.getElementById('phase-reorder').checked = true;
+        document.getElementById('phase-prod').checked = true;
+        document.getElementById('phase-recall').checked = true;
+        document.getElementById('phase-boss').checked = true;
+        document.getElementById('phase-cumulative').checked = true;
+
+        if (type === 'standard') {
+            document.getElementById('phase-audio-match').checked = true;
+        }
+        else if (type === 'audio') {
+            document.getElementById('meta-show-text').checked = false; 
+            document.getElementById('phase-audio-match').checked = true; 
+            document.getElementById('phase-reorder').checked = false; 
+            document.getElementById('meta-autoplay-drill').checked = true; 
+        }
+        else if (type === 'reading') {
+            document.getElementById('phase-audio-match').checked = false;
+            document.getElementById('phase-prod').checked = false; 
+            document.getElementById('phase-recall').checked = false; 
+            document.getElementById('phase-boss').checked = false; 
+        }
+        alert("Preset '" + type.toUpperCase() + "' applied!");
+    }
+
+    // --- FORM POPULATION ---
     function populateFormFromData(data) {
         if(data.meta) {
             document.getElementById('meta-title').value = data.meta.title || "";
+            // Safe Language Set
             const nDrop = document.getElementById('meta-native');
             if([...nDrop.options].some(o => o.value === data.meta.native_language)) nDrop.value = data.meta.native_language;
             const tDrop = document.getElementById('meta-target');
             if([...tDrop.options].some(o => o.value === data.meta.target_language)) tDrop.value = data.meta.target_language;
-
+            
+            // Safe Level Set
             if(data.meta.level) {
                 let lvl = data.meta.level.replace(/level/gi, '').trim().toUpperCase();
-                if(document.querySelector(`#meta-level option[value='${lvl}']`)) {
-                    document.getElementById('meta-level').value = lvl;
-                } else if (["A1","A2","B1","B2"].includes(lvl)) {
-                    document.getElementById('meta-level').value = lvl + ".1";
-                }
+                if(document.querySelector(`#meta-level option[value='${lvl}']`)) document.getElementById('meta-level').value = lvl;
+                else if(["A1","A2","B1","B2"].includes(lvl)) document.getElementById('meta-level').value = lvl + ".1";
             }
 
+            // BOX 1: DISPLAY
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
-            document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
+            document.getElementById('meta-hide-resp').checked = !!data.meta.hide_imprint_response;
 
-            const p = data.meta.phases || { recognition:true, reorder:true, production:true, recall:true, final_boss:true, cumulative:true };
-            document.getElementById('phase-recog').checked = !!p.recognition;
-            document.getElementById('phase-audio-match').checked = !!p.audio_match; 
-            document.getElementById('phase-reorder').checked = !!p.reorder;
-            document.getElementById('phase-prod').checked = !!p.production;
-            document.getElementById('phase-recall').checked = !!p.recall;
-            document.getElementById('phase-boss').checked = !!p.final_boss;
-            document.getElementById('phase-cumulative').checked = p.cumulative !== false; // Default true
-            document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
+            // BOX 2: AUDIO
+            document.getElementById('meta-autoplay-imprint').checked = !!data.meta.autoplay_imprint;
+            // Legacy mapping: audio_autoplay -> autoplay_drill
+            document.getElementById('meta-autoplay-drill').checked = !!data.meta.autoplay_drill || !!data.meta.audio_autoplay;
 
+            // BOX 3: ENGINE
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
             document.getElementById('meta-random').checked = !!data.meta.randomize;
+            document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
             document.getElementById('meta-interval').value = data.meta.cumulative_interval || 3;
+            // Loop config might store cumulative in phases or top level, default true
+            const p = data.meta.phases || {};
+            document.getElementById('phase-cumulative').checked = p.cumulative !== false;
+
+            // BOX 4: LOOP
+            document.getElementById('phase-recog').checked = p.recognition !== false; // Default True
+            document.getElementById('phase-audio-match').checked = !!p.audio_match;
+            document.getElementById('phase-reorder').checked = p.reorder !== false; // Default True
+            document.getElementById('phase-prod').checked = p.production !== false; // Default True
+            document.getElementById('phase-recall').checked = p.recall !== false; // Default True
+            document.getElementById('phase-boss').checked = p.final_boss !== false; // Default True
         }
 
         document.getElementById('links-container').innerHTML = '';
@@ -672,23 +553,23 @@
                     card.querySelector('.input-distractors').value = distractors;
                 }
 
-                if(link.trigger.audio_url && link.trigger.audio_url !== "placeholder") {
-                    card.querySelector('.f-t-aud').dataset.existing = link.trigger.audio_url;
-                    card.querySelector('.status-t-aud').innerHTML = "✅ Saved"; card.querySelector('.status-t-aud').classList.remove('hidden');
-                }
-                if(link.trigger.image_url) {
-                    card.querySelector('.f-t-img').dataset.existing = link.trigger.image_url;
-                    card.querySelector('.status-t-img').innerHTML = "✅ Saved"; card.querySelector('.status-t-img').classList.remove('hidden');
-                }
-                if(link.response.audio_url) {
-                    card.querySelector('.f-r-aud').dataset.existing = link.response.audio_url;
-                    card.querySelector('.status-r-aud').innerHTML = "✅ Saved"; card.querySelector('.status-r-aud').classList.remove('hidden');
-                }
+                // File Restoration
+                const rest = (type, url) => {
+                    if(url && url !== "placeholder") {
+                        card.querySelector(type).dataset.existing = url;
+                        card.querySelector(type.replace('.f-', '.status-')).innerHTML = "✅ Saved";
+                        card.querySelector(type.replace('.f-', '.status-')).classList.remove('hidden');
+                    }
+                };
+                rest('.f-t-img', link.trigger.image_url);
+                rest('.f-t-aud', link.trigger.audio_url);
+                rest('.f-r-aud', link.response.audio_url);
             });
         }
         updateLinkNumbers();
     }
 
+    // --- TIMING V9.2 ---
     function calcBaseTimes(text) {
         if (!text) return { reorder: 5, prod: 5, recall: 5 };
         const charCount = text.length;
@@ -713,107 +594,20 @@
         document.getElementById(`base-recall-${uid}`).innerText = `Base: ${Math.round(base.recall)}s`;
     }
 
+    // --- AI PROMPT ---
     function copyAiPrompt() {
-        const selectedNative = document.getElementById('meta-native').value;
-        const selectedTarget = document.getElementById('meta-target').value;
-        const selectedLevel = document.getElementById('meta-level').value;
-
-        const p = `You are a COUNCIL of Applied Linguists (Krashen, Nation) and Senior Data Engineers.
-
-TASK: Generate a procedural language lesson as VALID JSON (NO markdown, NO code blocks).
-
-👇 USER INPUT REQUIRED 👇
-TOPIC: [INSERT TOPIC: e.g., "Restaurant ordering", "Weather conversation"]
-NATIVE LANGUAGE: ${selectedNative}
-TARGET LANGUAGE: ${selectedTarget}
-LEVEL: ${selectedLevel}
-NUMBER OF LINKS: [INSERT NUMBER: e.g., 10, 15, 20]
-👆 END USER INPUT 👆
-
-CRITICAL REQUIREMENTS:
-1. OUTPUT: Raw JSON only (no preamble, no \`\`\`json blocks)
-2. PHONETICS: MANDATORY for Korean (ko-*). Use accurate romanization for pronunciation.
-3. DISTRACTORS: Must be plausible but clearly wrong. Same word type/length as correct answer.
-4. TRANSLATION: Must be provided - used for testing context.
-5. NO PUNCTUATION: response.text must NOT end with . ! ?
-6. PROGRESSIVE DIFFICULTY: Start simple, increase complexity within the level.
-
-SCHEMA:
-{
-  "lesson_id": "String (e.g. 'ko-A1-basics-01')",
-  "meta": {
-    "title": "String (Required)",
-    "native_language": "${selectedNative}",
-    "target_language": "${selectedTarget}",
-    "level": "${selectedLevel}",
-    
-    // --- DIRECTOR MODE SETTINGS ---
-    "strict_mode": true,
-    "randomize": false,
-    "cumulative_interval": 3,
-    
-    "show_text": true,
-    "show_translation": false,
-    "show_phonetic": false,
-    
-    "voice_threshold": 0.7
-  },
-  "links": [
-    {
-      "trigger": {
-        "text": "String (Required)",
-        "audio_url": null,
-        "image_url": null,
-        "video_url": null
-      },
-      "response": {
-        "text": "String (Required - CLEAN, NO PUNCTUATION)",
-        "audio_url": null,
-        "translation": "String (Optional)",
-        "phonetic": "String (Optional)"
-      },
-      "steps": {
-        "1_model": { 
-           "type": "imprint", 
-           "display": ["trigger", "response", "translation", "phonetic", "image", "audio", "video"] 
-        },
-        "2_recognition": { 
-           "type": "multiple_choice", 
-           "time_limit": 5, 
-           "options": ["Correct Answer", "Distractor 1", "Distractor 2"] 
-        },
-        "3_reorder": { 
-           "type": "sentence_reorder", 
-           "time_limit": 15 
-        },
-        "4_production": { 
-           "type": "input_strict", 
-           "time_limit": 15, 
-           "display": ["trigger", "translation"]
-        },
-        "5_timed_recall": { 
-           "type": "input_strict", 
-           "time_limit": 10, 
-           "display": ["trigger"]
-        }
-      }
-    }
-  ]
-}
-KOREAN-SPECIFIC RULES (if target is ko-*):
-- Phonetic MUST use Revised Romanization (e.g., "annyeonghaseyo" not "anyonghaseyo")
-- Include particles in response.text (은/는, 이/가, etc.)
-- Vary formality levels appropriately for the level
-- Translation should show particle meanings: "사과를" → "apple (object marker)"
-
-VALIDATION:
-- Each link must have: trigger.text, response.text, response.translation
-- Options array must have exactly 3 items (1 correct + 2 distractors)
-- All distractors must be unique and different from correct answer
-- Ensure proper JSON escaping for quotes`;
-
+        const sn = document.getElementById('meta-native').value;
+        const st = document.getElementById('meta-target').value;
+        const sl = document.getElementById('meta-level').value;
+        const p = `ACT AS COUNCIL (Krashen/Nation/DataEng). GENERATE JSON LESSON.
+INPUTS: Topic=[INSERT], Native=${sn}, Target=${st}, Level=${sl}, Links=[10].
+REQUIREMENTS: Valid JSON only. Phonetics mandated for non-Latin. No trailing punct in response.text.
+SCHEMA: {
+  "meta": { "title": "Str", "native_language": "${sn}", "target_language": "${st}", "level": "${sl}" },
+  "links": [ { "trigger": {"text":""}, "response": {"text":"", "translation":"", "phonetic":""}, "steps": {"2_recognition": {"options":["Correct","Dist1","Dist2"]}} } ]
+}`;
         navigator.clipboard.writeText(p);
-        alert(`✅ PROMPT COPIED for ${selectedTarget} (${selectedLevel})\n\n1. Paste into AI\n2. Fill in TOPIC and NUMBER OF LINKS\n3. Copy JSON response back here`);
+        alert(`Prompt Copied for ${st} (${sl}).`);
     }
 
     function importJson() {
@@ -824,10 +618,11 @@ VALIDATION:
             document.getElementById('edit-mode-container').classList.add('hidden');
             document.getElementById('publish-btn').innerText = "/// PUBLISH ///";
             populateFormFromData(JSON.parse(raw));
-            alert("Data Loaded!");
+            alert("Loaded.");
         } catch(e) { alert("Invalid JSON."); }
     }
 
+    // --- UI HELPERS ---
     function updateLinkNumbers() { document.querySelectorAll('.card').forEach((c, i) => { c.querySelector('.link-label').innerText = `LINK #${i + 1}`; }); }
     function toggleId(id) { document.getElementById(id).classList.toggle('hidden'); }
     function removeThisLink(btn) { if(confirm("Delete?")) { btn.closest('.card').remove(); updateLinkNumbers(); } }
@@ -881,6 +676,7 @@ VALIDATION:
         return fileInput.dataset.existing || null;
     }
 
+    // --- PUBLISH LOGIC ---
     async function publishLesson() {
         if(!client) return;
         const overlay = document.getElementById('overlay');
@@ -888,6 +684,7 @@ VALIDATION:
         document.getElementById('overlay-text').innerText = "PROCESSING...";
 
         try {
+            // CAPTURE PHASES
             const phases = {
                 recognition: document.getElementById('phase-recog').checked,
                 audio_match: document.getElementById('phase-audio-match').checked,
@@ -903,8 +700,13 @@ VALIDATION:
                 native_language: document.getElementById('meta-native').value,
                 target_language: document.getElementById('meta-target').value,
                 level: document.getElementById('meta-level').value,
+                
                 phases: phases,
-                audio_autoplay: document.getElementById('meta-autoplay').checked,
+                // MAP FIELDS TO NEW V9 SCHEMA
+                hide_imprint_response: document.getElementById('meta-hide-resp').checked,
+                autoplay_imprint: document.getElementById('meta-autoplay-imprint').checked,
+                autoplay_drill: document.getElementById('meta-autoplay-drill').checked,
+                
                 show_text: document.getElementById('meta-show-text').checked,
                 show_translation: document.getElementById('meta-show-trans').checked,
                 show_phonetic: document.getElementById('meta-show-phon').checked,
@@ -932,8 +734,9 @@ VALIDATION:
                 const uAudT = await handleUpload(c.querySelector('.f-t-aud'));
                 const uAudR = await handleUpload(c.querySelector('.f-r-aud'));
 
-                if (meta.audio_autoplay && !uAudT) {
-                    warnings.push(`Link #${i+1}: Auto-Play is ON but no Trigger Audio file found.`);
+                // Warning Logic: If either autoplay is ON, we need audio.
+                if ((meta.autoplay_imprint || meta.autoplay_drill) && !uAudT) {
+                    warnings.push(`Link #${i+1}: Auto-Play ON but no Trigger Audio (TTS will be used).`);
                 }
 
                 const disStr = c.querySelector('.input-distractors').value;
@@ -954,6 +757,7 @@ VALIDATION:
                 const t_type = Math.max(5, Math.min(60, Math.round(baseProd + offProd)));
                 const t_recall = Math.max(5, Math.min(60, Math.round(baseRecall + offRecall)));
 
+                // STEP GENERATION (STRICT ORDER)
                 let steps = {};
                 steps["1_model"] = { type: "imprint", display: ["trigger", "response", "translation", "phonetic", "image"] };
                 if(phases.recognition) steps["2_recognition"] = { type: "multiple_choice", time_limit: 10, options: opts };
@@ -970,7 +774,7 @@ VALIDATION:
             }
 
             if (warnings.length > 0) {
-                if (!confirm("⚠️ WARNING: AUDIO MISSING\n\n" + warnings.join("\n") + "\n\nContinue anyway?")) {
+                if (!confirm("⚠️ AUDIO WARNINGS:\n" + warnings.join("\n") + "\n\nContinue?")) {
                     overlay.classList.add('hidden');
                     return;
                 }
@@ -994,6 +798,7 @@ VALIDATION:
 
     function shuffleArray(arr) { let a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
+    // --- PRINTING ---
     function printSection(section, isKey) {
         const title = document.getElementById('meta-title').value || "Lesson";
         const cards = document.querySelectorAll('.card');
