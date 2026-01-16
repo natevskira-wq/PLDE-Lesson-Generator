@@ -302,9 +302,47 @@
         <div class="page-header"><h1>📂 LOAD LESSON</h1></div>
         <div class="search-controls">
             <input type="text" id="lesson-search" class="search-box" placeholder="Search title...">
-            <select id="filter-native" class="filter-select"><option value="">Native: Any</option><option value="en-US">English</option></select>
-            <select id="filter-target" class="filter-select"><option value="">Target: Any</option><option value="de-DE">German</option></select>
-            <select id="filter-level" class="filter-select"><option value="">Level: Any</option><option value="A1.1">A1.1</option></select>
+            select id="filter-native" class="filter-select">
+                <option value="">Native: Any</option>
+                <option value="en-US">English</option>
+                <option value="de-DE">German</option>
+                <option value="es-ES">Spanish</option>
+                <option value="fr-FR">French</option>
+                <option value="it-IT">Italian</option>
+                <option value="pt-BR">Portuguese</option>
+                <option value="ru-RU">Russian</option>
+                <option value="zh-CN">Chinese</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ja-JP">Japanese</option>
+                <option value="ar-EG">Arabic</option>
+            </select>
+            <select id="filter-target" class="filter-select">
+                <option value="">Target: Any</option>
+                <option value="en-US">English</option>
+                <option value="de-DE">German</option>
+                <option value="es-ES">Spanish</option>
+                <option value="fr-FR">French</option>
+                <option value="it-IT">Italian</option>
+                <option value="pt-BR">Portuguese</option>
+                <option value="ru-RU">Russian</option>
+                <option value="zh-CN">Chinese</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ja-JP">Japanese</option>
+                <option value="ar-EG">Arabic</option>
+            </select>
+            <select id="filter-level" class="filter-select">
+                <option value="">Level: Any</option>
+                <option value="A1.1">A1.1</option>
+                <option value="A1.2">A1.2</option>
+                <option value="A2.1">A2.1</option>
+                <option value="A2.2">A2.2</option>
+                <option value="B1.1">B1.1</option>
+                <option value="B1.2">B1.2</option>
+                <option value="B2.1">B2.1</option>
+                <option value="B2.2">B2.2</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+            </select>
             <button class="btn" onclick="searchLessons()">🔍 SEARCH</button>
         </div>
         <div id="lesson-grid" class="lesson-grid"></div>
