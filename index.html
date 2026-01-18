@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V9.0 (ADVANCED CONTROLS)</title>
+    <title>PLDE // LESSON MANAGER V11 (PRIVATE)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -20,13 +20,14 @@
         body { background: var(--bg); color: var(--fg); font-family: var(--font); margin: 0; padding: 0; }
         
         /* PAGE CONTAINERS */
-        .page { display: none; padding: 2rem; max-width: 1000px; margin: 0 auto; min-height: calc(100vh - 70px); }
+        .page { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; min-height: calc(100vh - 70px); }
         .page.active { display: block; }
         
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; }
         .hidden { display: none !important; }
         .row { display: flex; gap: 1rem; margin-bottom: 1rem; }
         .col { flex: 1; }
+        .full-width { width: 100%; }
         
         h1 { font-size: 2rem; border-bottom: var(--border); padding-bottom: 1rem; margin-bottom: 2rem; text-transform: uppercase; }
         h3 { margin-top: 0; text-transform: uppercase; }
@@ -39,64 +40,105 @@
         .btn-outline { background: transparent; border: 2px solid var(--fg); color: var(--fg); }
         .btn-outline:hover { background: #eee; }
         
+        /* TOGGLE BUTTON STYLING */
         .btn-toggle { 
-            font-size: 0.9rem; padding: 0.6rem 1rem; border: 2px dashed var(--fg); background: #f9f9f9; 
-            cursor: pointer; width: 100%; text-align: left; font-weight: bold; margin-top: 1rem;
+            font-size: 0.9rem; 
+            padding: 0.6rem 1rem; 
+            border: 2px dashed var(--fg); 
+            background: #f9f9f9; 
+            cursor: pointer; 
+            width: 100%;
+            text-align: left;
+            font-weight: bold;
+            margin-top: 1rem;
         }
         .btn-toggle:hover { background: #eee; }
+
         .btn-delete { background: #ff4444; color: white; padding: 0.4rem 0.8rem; float: right; cursor: pointer; border: none; }
         
         /* CARD STYLES */
         .card { border: var(--border); padding: 1.5rem; margin-bottom: 2rem; background: #fff; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
         .toggle-area { background: #f9f9f9; padding: 1rem; border: 1px dashed #ccc; margin-top: 1rem; }
+
+        /* TIMING OVERRIDE BOX */
         .timing-box { background: #fff8e1; border-color: #ffa000; }
         .calc-display { font-size: 0.75rem; color: #666; margin-bottom: 5px; display: block; font-style: italic; }
 
+        /* BOX STYLES */
         .box-dashed { background: #fdfdfd; border: var(--border); padding: 1.5rem; margin-bottom: 2rem; border-style: dashed; }
+        .manager-box { border-color: #00aa00; background: #eeffee; }
         .ai-box { border-color: var(--accent); background: #eef; }
         
-        /* --- DIRECTOR CONSOLE V9 (GRID LAYOUT) --- */
+        /* DIRECTOR CONSOLE STYLES */
         .director-box {
-            background: #f4f4f4; border: var(--border); padding: 1.5rem; 
-            margin-top: 0.5rem; margin-bottom: 2rem; position: relative;
+            background: #f0f0f0;
+            border: var(--border);
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+            position: relative;
         }
         .director-box::before {
-            content: "🎬"; position: absolute; top: -15px; right: 20px; font-size: 2rem; 
-            background: var(--bg); padding: 0 5px; z-index: 10;
+            content: "🎬";
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            font-size: 2rem;
+            background: var(--bg);
+            padding: 0 5px;
+            z-index: 10;
         }
         
-        /* FIELDSET STYLING */
-        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
-        
-        fieldset { border: 2px solid var(--fg); padding: 1rem; background: #fff; margin: 0; min-height: 100%; }
-        legend { font-weight: bold; background: var(--fg); color: var(--bg); padding: 0.2rem 0.5rem; text-transform: uppercase; font-size: 0.85rem; }
-        
-        .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; }
-        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; }
-        .helper-text { font-size: 0.75rem; color: #666; margin-top: 0.2rem; display: block; margin-left: 1.5rem; }
+        .subsection-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.2rem;
+            color: #555;
+        }
+
+        .checkbox-group { display: flex; gap: 1.5rem; background: white; padding: 0.8rem; border: 2px solid #ccc; flex-wrap: wrap; }
+        .checkbox-group.vertical { flex-direction: column; gap: 0.5rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; text-transform: none; font-weight: normal; }
+        .helper-text { font-size: 0.75rem; color: #666; margin-top: 0.3rem; display: block; }
 
         .status-badge { display: inline-block; padding: 2px 5px; font-size: 0.8rem; border: 1px solid #ccc; margin-top: 5px; background: #fff; }
 
-        /* FOOTER & OVERLAY */
+        /* FOOTER BAR */
         .bottom-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 1rem; border-top: var(--border);
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; box-shadow: 0 -5px 10px rgba(0,0,0,0.05); z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: white; padding: 1rem;
+            border-top: var(--border);
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 0.5rem;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.05); z-index: 100;
         }
+
         .footer-btn, .footer-btn-outline {
-            padding: 0.9rem 0.5rem; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: var(--font); font-size: 0.85rem; 
-            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 44px; border: 2px solid var(--fg);
+            padding: 0.9rem 0.5rem; 
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+            font-family: var(--font); font-size: 0.85rem; 
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            min-height: 44px; border: 2px solid var(--fg);
         }
-        .footer-btn { background: var(--fg); color: var(--bg); }
-        .footer-btn-outline { background: transparent; color: var(--fg); }
+        .footer-btn { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+        .footer-btn-outline { background: transparent; color: var(--fg); border-color: var(--fg); }
         .footer-btn-outline:hover { background: #f0f0f0; }
 
+        /* PRESET BUTTONS */
+        .preset-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed #ccc; align-items: center; }
+        .btn-preset { font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid var(--fg); background: white; cursor: pointer; text-transform: uppercase; }
+        .btn-preset:hover { background: var(--fg); color: white; }
+
+        /* LOADING OVERLAY */
         #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .loader { width: 50px; height: 50px; border: 5px solid var(--fg); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* PRINT */
+        /* PRINT STYLES */
         #print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -109,7 +151,7 @@
             .recall-line { display: block; border-bottom: 1px solid black; height: 25px; margin-top: 10px; width: 100%; }
         }
 
-        /* BROWSER */
+        /* BROWSER PAGE STYLES */
         .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .lesson-card { border: 2px solid var(--fg); padding: 1.2rem; cursor: pointer; transition: transform 0.2s; background: white; }
         .lesson-card:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
@@ -122,7 +164,7 @@
         .btn-clear { background: #ff4444; color: white; border: none; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; }
         .search-controls { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 1rem; margin-bottom: 1.5rem; }
         
-        /* PRINT PAGE */
+        /* PRINT PAGE OPTIONS */
         .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .print-section { background: #f9f9f9; padding: 1.5rem; border: 2px solid var(--fg); }
         .print-buttons { display: flex; gap: 0.5rem; margin-top: 1rem; }
@@ -134,11 +176,13 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V9</h1>
+        <h1>PLDE // LESSON MANAGER V11</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
-            <div style="color: green; font-weight: bold;">✏️ EDITING MODE ACTIVE</div>
+            <div style="color: green; font-weight: bold;">
+                ✏️ EDITING MODE ACTIVE
+            </div>
             <button class="btn-clear" onclick="clearLoadedLesson()">CLEAR & RESET</button>
         </div>
 
@@ -152,6 +196,7 @@
                 <div class="col">
                     <textarea id="ai-input" rows="1" placeholder="Paste JSON from AI here..."></textarea>
                 </div>
+                <!-- CLEAR BUTTON -->
                 <div class="col" style="flex: 0 0 100px;">
                     <button class="btn-outline full-width" onclick="clearAiInput()">🧹 CLEAR</button>
                 </div>
@@ -164,9 +209,15 @@
         <!-- 1. HEADER & META -->
         <div class="section">
             <div class="row">
-                <div class="col">
+                <div class="col" style="flex: 2;">
                     <label>Lesson Title</label>
                     <input type="text" id="meta-title" placeholder="e.g. Travel Basics">
+                </div>
+                <!-- NEW: PRIVATE TOGGLE -->
+                <div class="col" style="display:flex; align-items:flex-end; padding-bottom:1rem;">
+                    <label class="checkbox-label" style="background:#eee; padding:0.5rem; border:2px solid var(--fg); width:100%; justify-content:center;">
+                        <input type="checkbox" id="meta-private" checked> 🔒 MAKE PRIVATE
+                    </label>
                 </div>
             </div>
             <div class="row">
@@ -215,73 +266,64 @@
             </div>
 
             <!-- TOGGLE BUTTON -->
-            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & AI SETTINGS (Toggle)</button>
+            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & LOOP CONFIG (Toggle)</button>
 
-            <!-- DIRECTOR CONSOLE V9 (4 BOX LAYOUT) -->
+            <!-- DIRECTOR CONSOLE -->
             <div id="director-console" class="director-box hidden">
-                <div style="margin-bottom:1rem; border-bottom:1px dashed #ccc; padding-bottom:0.5rem;">
-                    <span style="font-size:0.8rem; font-weight:bold; margin-right:10px;">QUICK PRESETS:</span>
-                    <button style="font-size:0.7rem;" onclick="applyPreset('standard')">STANDARD</button>
-                    <button style="font-size:0.7rem;" onclick="applyPreset('audio')">AUDIO DRILL</button>
-                    <button style="font-size:0.7rem;" onclick="applyPreset('reading')">READING</button>
+                <!-- PRESETS ROW -->
+                <div class="preset-row">
+                    <span style="font-weight:bold; font-size:0.8rem; margin-right:10px;">QUICK PRESETS:</span>
+                    <button class="btn-preset" onclick="applyPreset('standard')">Standard</button>
+                    <button class="btn-preset" onclick="applyPreset('audio')">Audio Drill</button>
+                    <button class="btn-preset" onclick="applyPreset('reading')">Reading Only</button>
                 </div>
 
-                <div class="settings-grid">
-                    <!-- BOX 1: DISPLAY -->
-                    <fieldset>
-                        <legend>1. Display</legend>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Trigger Text</label>
+                <div class="row">
+                    <!-- COLUMN 1: DISPLAY & VOICE -->
+                    <div class="col">
+                        <div class="subsection-title">PLAYER DISPLAY</div>
+                        <div class="checkbox-group vertical">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Display Trigger Text (Uncheck for Audio-Only)</label>
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-phon"> Show Phonetic</label>
+                        </div>
+                        
+                        <div style="margin-top:1rem;">
+                            <label>Voice Strictness</label>
+                            <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
+                        </div>
+                    </div>
+
+                    <!-- COLUMN 2: LOOP CONFIG -->
+                    <div class="col">
+                        <div class="subsection-title">⟳ LOOP CONFIGURATION</div>
+                        <div class="checkbox-group vertical">
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition (Step 2)</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match (Step 2.5)</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder (Step 3)</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production (Step 4)</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall (Step 5)</label>
                             <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
-                            <label class="checkbox-label" style="color:red;"><input type="checkbox" id="meta-hide-resp"> HIDE Response (TEST MODE)</label>
-                            <span class="helper-text">Hides text in Imprint step.</span>
-                        </div>
-                    </fieldset>
-
-                    <!-- BOX 2: AUDIO BEHAVIOR -->
-                    <fieldset>
-                        <legend>2. Audio Behavior</legend>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-imprint"> Auto-Play Trigger (Imprint)</label>
-                            <span class="helper-text">Plays audio immediately on new card.</span>
                             
-                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-drill"> Auto-Play Trigger (Drills)</label>
-                            <span class="helper-text">Plays audio during exercises.</span>
-                        </div>
-                    </fieldset>
-
-                    <!-- BOX 3: ENGINE TUNING -->
-                    <fieldset>
-                        <legend>3. Engine Tuning</legend>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Mode</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative Review</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Order</label>
-                            <div style="margin-top:0.5rem;">
-                                <label style="font-size:0.75rem;">Voice Threshold (0.1-1.0)</label>
-                                <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
-                            </div>
-                            <div style="margin-top:0.2rem;">
-                                <label style="font-size:0.75rem;">Review Interval</label>
-                                <input type="number" id="meta-interval" value="3">
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <!-- BOX 4: LOOP CONFIG -->
-                    <fieldset>
-                        <legend>4. Loop Config</legend>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall</label>
+                            <!-- CUMULATIVE & AUTO-PLAY -->
+                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Enable Cumulative Review</label>
                             <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay"> Auto-Play Trigger Audio</label>
                         </div>
-                    </fieldset>
+                    </div>
+                    
+                    <!-- COLUMN 3: ADVANCED -->
+                    <div class="col">
+                        <div class="subsection-title">ADVANCED</div>
+                        <div class="checkbox-group vertical">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Spelling</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Links</label>
+                        </div>
+                        <div style="margin-top:1rem;">
+                            <label>Cumulative Interval</label>
+                            <input type="number" id="meta-interval" value="3">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -296,14 +338,12 @@
     </div>
 </div>
 
-<!-- LESSON BROWSER -->
+<!-- LESSON BROWSER PAGE -->
 <div id="browser-page" class="page">
     <div class="container lesson-browser-page">
         <div class="page-header"><h1>📂 LOAD LESSON</h1></div>
         <div class="search-controls">
             <input type="text" id="lesson-search" class="search-box" placeholder="Search title...">
-            
-            <!-- Restored Full Language List -->
             <select id="filter-native" class="filter-select">
                 <option value="">Native: Any</option>
                 <option value="en-US">English</option>
@@ -318,7 +358,6 @@
                 <option value="ja-JP">Japanese</option>
                 <option value="ar-EG">Arabic</option>
             </select>
-
             <select id="filter-target" class="filter-select">
                 <option value="">Target: Any</option>
                 <option value="en-US">English</option>
@@ -333,8 +372,6 @@
                 <option value="ja-JP">Japanese</option>
                 <option value="ar-EG">Arabic</option>
             </select>
-
-            <!-- Restored Micro-Levels -->
             <select id="filter-level" class="filter-select">
                 <option value="">Level: Any</option>
                 <option value="A1.1">A1.1</option>
@@ -348,7 +385,6 @@
                 <option value="C1">C1</option>
                 <option value="C2">C2</option>
             </select>
-
             <button class="btn" onclick="searchLessons()">🔍 SEARCH</button>
         </div>
         <div id="lesson-grid" class="lesson-grid"></div>
@@ -369,9 +405,11 @@
     </div>
 </div>
 
+<!-- PRINT AREA & LOADER -->
 <div id="print-area"></div>
 <div id="overlay" class="hidden"><div class="loader"></div><h2 id="overlay-text">WORKING...</h2></div>
 
+<!-- BOTTOM ACTIONS -->
 <div class="bottom-bar">
     <button class="footer-btn" onclick="showPage('editor-page')">/// EDITOR ///</button>
     <button class="footer-btn-outline" onclick="showPage('browser-page')">📂 LOAD</button>
@@ -386,19 +424,27 @@
     let client = window.supabase ? window.supabase.createClient(SU_URL, SU_KEY) : null;
     let currentEditId = null; 
     let allLessons = [];
+    let adminCode = localStorage.getItem('plde_admin_code');
 
+    // --- PAGE NAVIGATION ---
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         if (pageId === 'browser-page') document.getElementById('lesson-grid').innerHTML = '';
     }
 
+    // --- INITIAL LOAD ---
     window.onload = async function() { 
+        if(!adminCode) {
+            adminCode = prompt("🔐 ENTER ADMIN ACCESS CODE (Required for Private Lessons):");
+            if(adminCode) localStorage.setItem('plde_admin_code', adminCode);
+        }
+
         if(client) await loadAllLessons();
         if (document.querySelectorAll('.card').length === 0) addLink();
     };
 
-    // --- LESSON BROWSER ---
+    // --- LESSON BROWSER LOGIC ---
     async function loadAllLessons() {
         try {
             const { data, error } = await client.from('lessons').select('id, title, created_at, content').order('created_at', { ascending: false });
@@ -412,7 +458,7 @@
                 level: l.content?.meta?.level || 'A1.1',
                 content: l.content
             }));
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Error loading lessons:", e); }
     }
 
     function searchLessons() {
@@ -457,9 +503,11 @@
         try {
             const { data, error } = await client.from('lessons').select('*').eq('id', id).single();
             if(error) throw error;
+
             currentEditId = data.id;
             document.getElementById('edit-mode-container').classList.remove('hidden');
             document.getElementById('publish-btn').innerText = "/// UPDATE ///";
+
             populateFormFromData(data.content);
             document.getElementById('meta-title').value = data.title; 
             showPage('editor-page');
@@ -502,11 +550,7 @@
         document.getElementById('meta-show-text').checked = true;
         document.getElementById('meta-show-trans').checked = false;
         document.getElementById('meta-show-phon').checked = false;
-        document.getElementById('meta-hide-resp').checked = false; // Test Mode Off
         
-        document.getElementById('meta-autoplay-imprint').checked = false;
-        document.getElementById('meta-autoplay-drill').checked = false;
-
         document.getElementById('phase-recog').checked = true;
         document.getElementById('phase-audio-match').checked = false;
         document.getElementById('phase-reorder').checked = true;
@@ -514,6 +558,7 @@
         document.getElementById('phase-recall').checked = true;
         document.getElementById('phase-boss').checked = true;
         document.getElementById('phase-cumulative').checked = true;
+        document.getElementById('meta-autoplay').checked = false;
 
         if (type === 'standard') {
             document.getElementById('phase-audio-match').checked = true;
@@ -522,7 +567,7 @@
             document.getElementById('meta-show-text').checked = false; 
             document.getElementById('phase-audio-match').checked = true; 
             document.getElementById('phase-reorder').checked = false; 
-            document.getElementById('meta-autoplay-drill').checked = true; 
+            document.getElementById('meta-autoplay').checked = true; 
         }
         else if (type === 'reading') {
             document.getElementById('phase-audio-match').checked = false;
@@ -554,12 +599,6 @@
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
-            document.getElementById('meta-hide-resp').checked = !!data.meta.hide_imprint_response;
-
-            // BOX 2: AUDIO
-            document.getElementById('meta-autoplay-imprint').checked = !!data.meta.autoplay_imprint;
-            // Legacy mapping: audio_autoplay -> autoplay_drill
-            document.getElementById('meta-autoplay-drill').checked = !!data.meta.autoplay_drill || !!data.meta.audio_autoplay;
 
             // BOX 3: ENGINE
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
@@ -571,12 +610,16 @@
             document.getElementById('phase-cumulative').checked = p.cumulative !== false;
 
             // BOX 4: LOOP
-            document.getElementById('phase-recog').checked = p.recognition !== false; // Default True
+            document.getElementById('phase-recog').checked = p.recognition !== false; 
             document.getElementById('phase-audio-match').checked = !!p.audio_match;
-            document.getElementById('phase-reorder').checked = p.reorder !== false; // Default True
-            document.getElementById('phase-prod').checked = p.production !== false; // Default True
-            document.getElementById('phase-recall').checked = p.recall !== false; // Default True
-            document.getElementById('phase-boss').checked = p.final_boss !== false; // Default True
+            document.getElementById('phase-reorder').checked = p.reorder !== false; 
+            document.getElementById('phase-prod').checked = p.production !== false; 
+            document.getElementById('phase-recall').checked = p.recall !== false; 
+            document.getElementById('phase-boss').checked = p.final_boss !== false; 
+            document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
+            
+            // PRIVATE CHECKBOX
+            document.getElementById('meta-private').checked = !!data.owner_code || !!data.meta.owner_code;
         }
 
         document.getElementById('links-container').innerHTML = '';
@@ -720,7 +763,6 @@ SCHEMA: {
         return fileInput.dataset.existing || null;
     }
 
-    // --- PUBLISH LOGIC ---
     async function publishLesson() {
         if(!client) return;
         const overlay = document.getElementById('overlay');
@@ -728,7 +770,6 @@ SCHEMA: {
         document.getElementById('overlay-text').innerText = "PROCESSING...";
 
         try {
-            // CAPTURE PHASES
             const phases = {
                 recognition: document.getElementById('phase-recog').checked,
                 audio_match: document.getElementById('phase-audio-match').checked,
@@ -739,18 +780,17 @@ SCHEMA: {
                 cumulative: document.getElementById('phase-cumulative').checked
             };
 
+            // PRIVATE LESSON LOGIC
+            const isPrivate = document.getElementById('meta-private').checked;
+            const ownerCode = isPrivate ? adminCode : null;
+
             const meta = {
                 title: document.getElementById('meta-title').value.trim(),
                 native_language: document.getElementById('meta-native').value,
                 target_language: document.getElementById('meta-target').value,
                 level: document.getElementById('meta-level').value,
-                
                 phases: phases,
-                // MAP FIELDS TO NEW V9 SCHEMA
-                hide_imprint_response: document.getElementById('meta-hide-resp').checked,
-                autoplay_imprint: document.getElementById('meta-autoplay-imprint').checked,
-                autoplay_drill: document.getElementById('meta-autoplay-drill').checked,
-                
+                audio_autoplay: document.getElementById('meta-autoplay').checked,
                 show_text: document.getElementById('meta-show-text').checked,
                 show_translation: document.getElementById('meta-show-trans').checked,
                 show_phonetic: document.getElementById('meta-show-phon').checked,
@@ -778,8 +818,7 @@ SCHEMA: {
                 const uAudT = await handleUpload(c.querySelector('.f-t-aud'));
                 const uAudR = await handleUpload(c.querySelector('.f-r-aud'));
 
-                // Warning Logic: If either autoplay is ON, we need audio.
-                if ((meta.autoplay_imprint || meta.autoplay_drill) && !uAudT) {
+                if (meta.audio_autoplay && !uAudT) {
                     warnings.push(`Link #${i+1}: Auto-Play ON but no Trigger Audio (TTS will be used).`);
                 }
 
@@ -801,7 +840,6 @@ SCHEMA: {
                 const t_type = Math.max(5, Math.min(60, Math.round(baseProd + offProd)));
                 const t_recall = Math.max(5, Math.min(60, Math.round(baseRecall + offRecall)));
 
-                // STEP GENERATION (STRICT ORDER)
                 let steps = {};
                 steps["1_model"] = { type: "imprint", display: ["trigger", "response", "translation", "phonetic", "image"] };
                 if(phases.recognition) steps["2_recognition"] = { type: "multiple_choice", time_limit: 10, options: opts };
@@ -825,13 +863,14 @@ SCHEMA: {
             }
 
             const json = { lesson_id: currentEditId ? `updated_${Date.now()}` : `${meta.target_language}-${meta.level}-${Date.now()}`, meta, links };
-            
+            const payload = { title: meta.title, content: json, owner_code: ownerCode };
+
             if(currentEditId) {
-                const { error } = await client.from('lessons').update({ title: meta.title, content: json }).eq('id', currentEditId);
+                const { error } = await client.from('lessons').update(payload).eq('id', currentEditId);
                 if(error) throw error;
                 alert("✅ Updated!");
             } else {
-                const { error } = await client.from('lessons').insert([{ title: meta.title, content: json }]);
+                const { error } = await client.from('lessons').insert([payload]);
                 if(error) throw error;
                 alert("✅ Published!");
             }
