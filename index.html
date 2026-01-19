@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V11.1</title>
+    <title>PLDE // LESSON MANAGER V11.2</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -29,68 +29,52 @@
         .col { flex: 1; }
         .full-width { width: 100%; }
         
-        h1 { font-size: 2rem; border-bottom: var(--border); padding-bottom: 1rem; margin-bottom: 2rem; text-transform: uppercase; }
+        /* HEADER */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: var(--border); padding-bottom: 1rem; margin-bottom: 2rem; 
+        }
+        h1 { font-size: 2rem; margin: 0; text-transform: uppercase; }
+        
         h3 { margin-top: 0; text-transform: uppercase; }
         label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; }
         
         input, select, textarea { width: 100%; padding: 0.8rem; border: 2px solid #ccc; font-family: var(--font); font-size: 1rem; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); color: var(--accent); }
 
+        /* BUTTONS */
         .btn { background: var(--fg); color: var(--bg); border: none; padding: 0.8rem 1.5rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .btn-outline { background: transparent; border: 2px solid var(--fg); color: var(--fg); }
         .btn-outline:hover { background: #eee; }
         
-        /* TOGGLE BUTTON STYLING */
         .btn-toggle { 
-            font-size: 0.9rem; 
-            padding: 0.6rem 1rem; 
-            border: 2px dashed var(--fg); 
-            background: #f9f9f9; 
-            cursor: pointer; 
-            width: 100%;
-            text-align: left;
-            font-weight: bold;
-            margin-top: 1rem;
+            font-size: 0.9rem; padding: 0.6rem 1rem; border: 2px dashed var(--fg); background: #f9f9f9; 
+            cursor: pointer; width: 100%; text-align: left; font-weight: bold; margin-top: 1rem;
         }
         .btn-toggle:hover { background: #eee; }
-
         .btn-delete { background: #ff4444; color: white; padding: 0.4rem 0.8rem; float: right; cursor: pointer; border: none; }
         
         /* CARD STYLES */
         .card { border: var(--border); padding: 1.5rem; margin-bottom: 2rem; background: #fff; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
         .toggle-area { background: #f9f9f9; padding: 1rem; border: 1px dashed #ccc; margin-top: 1rem; }
-
-        /* TIMING OVERRIDE BOX */
         .timing-box { background: #fff8e1; border-color: #ffa000; }
         .calc-display { font-size: 0.75rem; color: #666; margin-bottom: 5px; display: block; font-style: italic; }
 
-        /* BOX STYLES */
         .box-dashed { background: #fdfdfd; border: var(--border); padding: 1.5rem; margin-bottom: 2rem; border-style: dashed; }
         .manager-box { border-color: #00aa00; background: #eeffee; }
         .ai-box { border-color: var(--accent); background: #eef; }
         
-        /* DIRECTOR CONSOLE STYLES */
+        /* DIRECTOR CONSOLE */
         .director-box {
-            background: #f0f0f0;
-            border: var(--border);
-            padding: 1.5rem;
-            margin-top: 0.5rem;
-            margin-bottom: 2rem;
-            position: relative;
+            background: #f4f4f4; border: var(--border); padding: 1.5rem; 
+            margin-top: 0.5rem; margin-bottom: 2rem; position: relative;
         }
         .director-box::before {
-            content: "🎬";
-            position: absolute;
-            top: -15px;
-            right: 20px;
-            font-size: 2rem;
-            background: var(--bg);
-            padding: 0 5px;
-            z-index: 10;
+            content: "🎬"; position: absolute; top: -15px; right: 20px; font-size: 2rem; 
+            background: var(--bg); padding: 0 5px; z-index: 10;
         }
         
-        /* 4-BOX LAYOUT RESTORED */
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
         
@@ -100,36 +84,21 @@
         .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; }
         .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; text-transform: none; font-weight: normal; }
         
-        /* HELPER TEXT RESTORED */
         .helper-text {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: -0.2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-            margin-left: 1.8rem; /* Align with checkbox text */
-            font-style: italic;
+            font-size: 0.75rem; color: #666; margin-top: -0.2rem; margin-bottom: 0.5rem;
+            display: block; margin-left: 1.8rem; font-style: italic;
         }
 
         .status-badge { display: inline-block; padding: 2px 5px; font-size: 0.8rem; border: 1px solid #ccc; margin-top: 5px; background: #fff; }
 
-        /* FOOTER BAR */
+        /* FOOTER & OVERLAY */
         .bottom-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: white; padding: 1rem;
-            border-top: var(--border);
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 0.5rem;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.05); z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 1rem; border-top: var(--border);
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; box-shadow: 0 -5px 10px rgba(0,0,0,0.05); z-index: 100;
         }
-
         .footer-btn, .footer-btn-outline {
-            padding: 0.9rem 0.5rem; 
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-            font-family: var(--font); font-size: 0.85rem; 
-            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            min-height: 44px; border: 2px solid var(--fg);
+            padding: 0.9rem 0.5rem; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: var(--font); font-size: 0.85rem; 
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 44px; border: 2px solid var(--fg);
         }
         .footer-btn { background: var(--fg); color: var(--bg); border-color: var(--fg); }
         .footer-btn-outline { background: transparent; color: var(--fg); border-color: var(--fg); }
@@ -140,7 +109,7 @@
         .btn-preset { font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid var(--fg); background: white; cursor: pointer; text-transform: uppercase; }
         .btn-preset:hover { background: var(--fg); color: white; }
 
-        /* LOADING OVERLAY */
+        /* LOADING */
         #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .loader { width: 50px; height: 50px; border: 5px solid var(--fg); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -158,7 +127,7 @@
             .recall-line { display: block; border-bottom: 1px solid black; height: 25px; margin-top: 10px; width: 100%; }
         }
 
-        /* BROWSER PAGE STYLES */
+        /* BROWSER PAGE */
         .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .lesson-card { border: 2px solid var(--fg); padding: 1.2rem; cursor: pointer; transition: transform 0.2s; background: white; }
         .lesson-card:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
@@ -183,13 +152,15 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V11.1</h1>
+        <header>
+            <h1>PLDE // LESSON MANAGER V11.2</h1>
+            <!-- THIS BUTTON LINKED TO MANAGER -->
+            <button id="btn-users" class="btn-outline hidden" onclick="window.location.href='manager.html'">👥 USERS</button>
+        </header>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
-            <div style="color: green; font-weight: bold;">
-                ✏️ EDITING MODE ACTIVE
-            </div>
+            <div style="color: green; font-weight: bold;">✏️ EDITING MODE ACTIVE</div>
             <button class="btn-clear" onclick="clearLoadedLesson()">CLEAR & RESET</button>
         </div>
 
@@ -203,7 +174,6 @@
                 <div class="col">
                     <textarea id="ai-input" rows="1" placeholder="Paste JSON from AI here..."></textarea>
                 </div>
-                <!-- CLEAR BUTTON -->
                 <div class="col" style="flex: 0 0 100px;">
                     <button class="btn-outline full-width" onclick="clearAiInput()">🧹 CLEAR</button>
                 </div>
@@ -220,7 +190,7 @@
                     <label>Lesson Title</label>
                     <input type="text" id="meta-title" placeholder="e.g. Travel Basics">
                 </div>
-                <!-- NEW: PRIVATE TOGGLE -->
+                <!-- PRIVATE TOGGLE -->
                 <div class="col" style="display:flex; align-items:flex-end; padding-bottom:1rem;">
                     <label class="checkbox-label" style="background:#eee; padding:0.5rem; border:2px solid var(--fg); width:100%; justify-content:center;">
                         <input type="checkbox" id="meta-private" checked> 🔒 MAKE PRIVATE
@@ -231,42 +201,26 @@
                 <div class="col">
                     <label>Native Language</label>
                     <select id="meta-native">
-                        <option value="en-US">English (en-US)</option>
-                        <option value="de-DE">German (de-DE)</option>
-                        <option value="es-ES">Spanish (es-ES)</option>
-                        <option value="fr-FR">French (fr-FR)</option>
-                        <option value="it-IT">Italian (it-IT)</option>
-                        <option value="pt-BR">Portuguese (pt-BR)</option>
-                        <option value="ru-RU">Russian (ru-RU)</option>
-                        <option value="zh-CN">Chinese (zh-CN)</option>
-                        <option value="ko-KR">Korean (ko-KR)</option>
-                        <option value="ja-JP">Japanese (ja-JP)</option>
-                        <option value="ar-EG">Arabic (ar-EG)</option>
+                        <option value="en-US">English (en-US)</option><option value="de-DE">German (de-DE)</option><option value="es-ES">Spanish (es-ES)</option>
+                        <option value="fr-FR">French (fr-FR)</option><option value="it-IT">Italian (it-IT)</option><option value="pt-BR">Portuguese (pt-BR)</option>
+                        <option value="ru-RU">Russian (ru-RU)</option><option value="zh-CN">Chinese (zh-CN)</option><option value="ko-KR">Korean (ko-KR)</option>
+                        <option value="ja-JP">Japanese (ja-JP)</option><option value="ar-EG">Arabic (ar-EG)</option>
                     </select>
                 </div>
                 <div class="col">
                     <label>Target Language</label>
                     <select id="meta-target">
-                        <option value="en-US">English (en-US)</option>
-                        <option value="de-DE">German (de-DE)</option>
-                        <option value="es-ES">Spanish (es-ES)</option>
-                        <option value="fr-FR">French (fr-FR)</option>
-                        <option value="it-IT">Italian (it-IT)</option>
-                        <option value="pt-BR">Portuguese (pt-BR)</option>
-                        <option value="ru-RU">Russian (ru-RU)</option>
-                        <option value="zh-CN">Chinese (zh-CN)</option>
-                        <option value="ko-KR">Korean (ko-KR)</option>
-                        <option value="ja-JP">Japanese (ja-JP)</option>
-                        <option value="ar-EG">Arabic (ar-EG)</option>
+                        <option value="en-US">English (en-US)</option><option value="de-DE">German (de-DE)</option><option value="es-ES">Spanish (es-ES)</option>
+                        <option value="fr-FR">French (fr-FR)</option><option value="it-IT">Italian (it-IT)</option><option value="pt-BR">Portuguese (pt-BR)</option>
+                        <option value="ru-RU">Russian (ru-RU)</option><option value="zh-CN">Chinese (zh-CN)</option><option value="ko-KR">Korean (ko-KR)</option>
+                        <option value="ja-JP">Japanese (ja-JP)</option><option value="ar-EG">Arabic (ar-EG)</option>
                     </select>
                 </div>
                 <div class="col">
                     <label>Level</label>
                     <select id="meta-level">
-                        <option value="A1.1">A1.1</option><option value="A1.2">A1.2</option>
-                        <option value="A2.1">A2.1</option><option value="A2.2">A2.2</option>
-                        <option value="B1.1">B1.1</option><option value="B1.2">B1.2</option>
-                        <option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
+                        <option value="A1.1">A1.1</option><option value="A1.2">A1.2</option><option value="A2.1">A2.1</option><option value="A2.2">A2.2</option>
+                        <option value="B1.1">B1.1</option><option value="B1.2">B1.2</option><option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
                         <option value="C1">C1</option><option value="C2">C2</option>
                     </select>
                 </div>
@@ -275,9 +229,8 @@
             <!-- TOGGLE BUTTON -->
             <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & AI SETTINGS (Toggle)</button>
 
-            <!-- DIRECTOR CONSOLE V11 (RESTORED 4-BOX LAYOUT) -->
+            <!-- DIRECTOR CONSOLE V9 (4 BOX LAYOUT) -->
             <div id="director-console" class="director-box hidden">
-                <!-- PRESETS ROW -->
                 <div class="preset-row">
                     <span style="font-weight:bold; font-size:0.8rem; margin-right:10px;">QUICK PRESETS:</span>
                     <button class="btn-preset" onclick="applyPreset('standard')">Standard</button>
@@ -292,13 +245,10 @@
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Trigger Text</label>
                             <span class="helper-text">Uncheck for Audio-Only drills.</span>
-                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
                             <span class="helper-text">Shows native meaning.</span>
-                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-phon"> Show Phonetic</label>
                             <span class="helper-text">For non-Latin scripts.</span>
-                            
                             <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
                             <label class="checkbox-label" style="color:red;"><input type="checkbox" id="meta-hide-resp"> HIDE Response (TEST)</label>
                             <span class="helper-text">Student must type without seeing answer.</span>
@@ -311,7 +261,6 @@
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-imprint"> Auto-Play (Imprint)</label>
                             <span class="helper-text">Plays immediately on new card.</span>
-                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-drill"> Auto-Play (Drills)</label>
                             <span class="helper-text">Plays audio during exercises.</span>
                         </div>
@@ -323,22 +272,12 @@
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Mode</label>
                             <span class="helper-text">Requires perfect spelling.</span>
-                            
                             <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative Review</label>
                             <span class="helper-text">Periodically review previous items.</span>
-                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Order</label>
                             <span class="helper-text">Shuffle the sequence.</span>
-                            
-                            <div style="margin-top:0.5rem;">
-                                <label style="font-size:0.75rem;">Voice Threshold (0.1-1.0)</label>
-                                <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
-                                <span class="helper-text">0.1 = Forgiving | 1.0 = Strict</span>
-                            </div>
-                            <div style="margin-top:0.2rem;">
-                                <label style="font-size:0.75rem;">Review Interval</label>
-                                <input type="number" id="meta-interval" value="3">
-                            </div>
+                            <div style="margin-top:0.5rem;"><label style="font-size:0.75rem;">Voice Threshold</label><input type="number" id="meta-threshold" step="0.1" value="0.7"></div>
+                            <div style="margin-top:0.2rem;"><label style="font-size:0.75rem;">Review Interval</label><input type="number" id="meta-interval" value="3"></div>
                         </div>
                     </fieldset>
 
@@ -374,52 +313,24 @@
         <div class="page-header"><h1>📂 LOAD LESSON</h1></div>
         <div class="search-controls">
             <input type="text" id="lesson-search" class="search-box" placeholder="Search title...">
-            
-            <!-- RESTORED FULL LANGUAGE LISTS -->
             <select id="filter-native" class="filter-select">
-                <option value="">Native: Any</option>
-                <option value="en-US">English</option>
-                <option value="de-DE">German</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-BR">Portuguese</option>
-                <option value="ru-RU">Russian</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="ar-EG">Arabic</option>
+                <option value="">Native: Any</option><option value="en-US">English</option><option value="de-DE">German</option>
+                <option value="es-ES">Spanish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option>
+                <option value="pt-BR">Portuguese</option><option value="ru-RU">Russian</option><option value="zh-CN">Chinese</option>
+                <option value="ko-KR">Korean</option><option value="ja-JP">Japanese</option><option value="ar-EG">Arabic</option>
             </select>
-
             <select id="filter-target" class="filter-select">
-                <option value="">Target: Any</option>
-                <option value="en-US">English</option>
-                <option value="de-DE">German</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-BR">Portuguese</option>
-                <option value="ru-RU">Russian</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="ar-EG">Arabic</option>
+                <option value="">Target: Any</option><option value="en-US">English</option><option value="de-DE">German</option>
+                <option value="es-ES">Spanish</option><option value="fr-FR">French</option><option value="it-IT">Italian</option>
+                <option value="pt-BR">Portuguese</option><option value="ru-RU">Russian</option><option value="zh-CN">Chinese</option>
+                <option value="ko-KR">Korean</option><option value="ja-JP">Japanese</option><option value="ar-EG">Arabic</option>
             </select>
-
             <select id="filter-level" class="filter-select">
-                <option value="">Level: Any</option>
-                <option value="A1.1">A1.1</option>
-                <option value="A1.2">A1.2</option>
-                <option value="A2.1">A2.1</option>
-                <option value="A2.2">A2.2</option>
-                <option value="B1.1">B1.1</option>
-                <option value="B1.2">B1.2</option>
-                <option value="B2.1">B2.1</option>
-                <option value="B2.2">B2.2</option>
-                <option value="C1">C1</option>
-                <option value="C2">C2</option>
+                <option value="">Level: Any</option><option value="A1.1">A1.1</option><option value="A1.2">A1.2</option>
+                <option value="A2.1">A2.1</option><option value="A2.2">A2.2</option><option value="B1.1">B1.1</option>
+                <option value="B1.2">B1.2</option><option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
+                <option value="C1">C1</option><option value="C2">C2</option>
             </select>
-
             <button class="btn" onclick="searchLessons()">🔍 SEARCH</button>
         </div>
         <div id="lesson-grid" class="lesson-grid"></div>
@@ -470,10 +381,24 @@
             adminCode = prompt("🔐 ENTER ADMIN ACCESS CODE (Required for Private Lessons):");
             if(adminCode) localStorage.setItem('plde_admin_code', adminCode);
         }
-
-        if(client) await loadAllLessons();
+        
+        if(client) {
+            await loadAllLessons();
+            await checkAdminRole();
+        }
+        
         if (document.querySelectorAll('.card').length === 0) addLink();
     };
+
+    // --- CHECK ADMIN ROLE ---
+    async function checkAdminRole() {
+        if(!adminCode) return;
+        // Queries USER_PROFILES (correct table)
+        const { data, error } = await client.from('user_profiles').select('role').eq('code', adminCode).single();
+        if(data && data.role === 'admin') {
+            document.getElementById('btn-users').classList.remove('hidden');
+        }
+    }
 
     // --- LESSON BROWSER LOGIC ---
     async function loadAllLessons() {
@@ -616,40 +541,32 @@
     function populateFormFromData(data) {
         if(data.meta) {
             document.getElementById('meta-title').value = data.meta.title || "";
-            // Safe Language Set
             const nDrop = document.getElementById('meta-native');
             if([...nDrop.options].some(o => o.value === data.meta.native_language)) nDrop.value = data.meta.native_language;
             const tDrop = document.getElementById('meta-target');
             if([...tDrop.options].some(o => o.value === data.meta.target_language)) tDrop.value = data.meta.target_language;
             
-            // Safe Level Set
             if(data.meta.level) {
                 let lvl = data.meta.level.replace(/level/gi, '').trim().toUpperCase();
                 if(document.querySelector(`#meta-level option[value='${lvl}']`)) document.getElementById('meta-level').value = lvl;
                 else if(["A1","A2","B1","B2"].includes(lvl)) document.getElementById('meta-level').value = lvl + ".1";
             }
 
-            // BOX 1: DISPLAY
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
             document.getElementById('meta-hide-resp').checked = !!data.meta.hide_imprint_response;
 
-            // BOX 2: AUDIO
             document.getElementById('meta-autoplay-imprint').checked = !!data.meta.autoplay_imprint;
-            // Legacy mapping: audio_autoplay -> autoplay_drill
             document.getElementById('meta-autoplay-drill').checked = !!data.meta.autoplay_drill || !!data.meta.audio_autoplay;
 
-            // BOX 3: ENGINE
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
             document.getElementById('meta-random').checked = !!data.meta.randomize;
             document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
             document.getElementById('meta-interval').value = data.meta.cumulative_interval || 3;
-            // Loop config might store cumulative in phases or top level, default true
             const p = data.meta.phases || {};
             document.getElementById('phase-cumulative').checked = p.cumulative !== false;
 
-            // BOX 4: LOOP
             document.getElementById('phase-recog').checked = p.recognition !== false; 
             document.getElementById('phase-audio-match').checked = !!p.audio_match;
             document.getElementById('phase-reorder').checked = p.reorder !== false; 
@@ -657,7 +574,6 @@
             document.getElementById('phase-recall').checked = p.recall !== false; 
             document.getElementById('phase-boss').checked = p.final_boss !== false; 
             
-            // PRIVATE CHECKBOX
             document.getElementById('meta-private').checked = !!data.owner_code || !!data.meta.owner_code;
         }
 
@@ -679,7 +595,6 @@
                     card.querySelector('.input-distractors').value = distractors;
                 }
 
-                // File Restoration
                 const rest = (type, url) => {
                     if(url && url !== "placeholder") {
                         card.querySelector(type).dataset.existing = url;
