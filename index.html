@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V11 (PRIVATE)</title>
+    <title>PLDE // LESSON MANAGER V11.1</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -20,10 +20,10 @@
         body { background: var(--bg); color: var(--fg); font-family: var(--font); margin: 0; padding: 0; }
         
         /* PAGE CONTAINERS */
-        .page { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; min-height: calc(100vh - 70px); }
+        .page { display: none; padding: 2rem; max-width: 1000px; margin: 0 auto; min-height: calc(100vh - 70px); }
         .page.active { display: block; }
         
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .hidden { display: none !important; }
         .row { display: flex; gap: 1rem; margin-bottom: 1rem; }
         .col { flex: 1; }
@@ -90,19 +90,26 @@
             z-index: 10;
         }
         
-        .subsection-title {
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-bottom: 2px solid #ccc;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.2rem;
-            color: #555;
-        }
-
-        .checkbox-group { display: flex; gap: 1.5rem; background: white; padding: 0.8rem; border: 2px solid #ccc; flex-wrap: wrap; }
-        .checkbox-group.vertical { flex-direction: column; gap: 0.5rem; }
+        /* 4-BOX LAYOUT RESTORED */
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
+        
+        fieldset { border: 2px solid var(--fg); padding: 1rem; background: #fff; margin: 0; min-height: 100%; }
+        legend { font-weight: bold; background: var(--fg); color: var(--bg); padding: 0.2rem 0.5rem; text-transform: uppercase; font-size: 0.85rem; }
+        
+        .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; }
         .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; text-transform: none; font-weight: normal; }
-        .helper-text { font-size: 0.75rem; color: #666; margin-top: 0.3rem; display: block; }
+        
+        /* HELPER TEXT RESTORED */
+        .helper-text {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: -0.2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            margin-left: 1.8rem; /* Align with checkbox text */
+            font-style: italic;
+        }
 
         .status-badge { display: inline-block; padding: 2px 5px; font-size: 0.8rem; border: 1px solid #ccc; margin-top: 5px; background: #fff; }
 
@@ -176,7 +183,7 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V11</h1>
+        <h1>PLDE // LESSON MANAGER V11.1</h1>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
@@ -266,9 +273,9 @@
             </div>
 
             <!-- TOGGLE BUTTON -->
-            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & LOOP CONFIG (Toggle)</button>
+            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & AI SETTINGS (Toggle)</button>
 
-            <!-- DIRECTOR CONSOLE -->
+            <!-- DIRECTOR CONSOLE V11 (RESTORED 4-BOX LAYOUT) -->
             <div id="director-console" class="director-box hidden">
                 <!-- PRESETS ROW -->
                 <div class="preset-row">
@@ -278,52 +285,75 @@
                     <button class="btn-preset" onclick="applyPreset('reading')">Reading Only</button>
                 </div>
 
-                <div class="row">
-                    <!-- COLUMN 1: DISPLAY & VOICE -->
-                    <div class="col">
-                        <div class="subsection-title">PLAYER DISPLAY</div>
-                        <div class="checkbox-group vertical">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Display Trigger Text (Uncheck for Audio-Only)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-phon"> Show Phonetic</label>
-                        </div>
-                        
-                        <div style="margin-top:1rem;">
-                            <label>Voice Strictness</label>
-                            <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
-                        </div>
-                    </div>
-
-                    <!-- COLUMN 2: LOOP CONFIG -->
-                    <div class="col">
-                        <div class="subsection-title">⟳ LOOP CONFIGURATION</div>
-                        <div class="checkbox-group vertical">
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition (Step 2)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match (Step 2.5)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder (Step 3)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production (Step 4)</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall (Step 5)</label>
-                            <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
+                <div class="settings-grid">
+                    <!-- BOX 1: DISPLAY -->
+                    <fieldset>
+                        <legend>1. Display</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Trigger Text</label>
+                            <span class="helper-text">Uncheck for Audio-Only drills.</span>
                             
-                            <!-- CUMULATIVE & AUTO-PLAY -->
-                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Enable Cumulative Review</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
+                            <span class="helper-text">Shows native meaning.</span>
+                            
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-phon"> Show Phonetic</label>
+                            <span class="helper-text">For non-Latin scripts.</span>
+                            
+                            <hr style="width:100%; border:0; border-top:1px dashed #ccc;">
+                            <label class="checkbox-label" style="color:red;"><input type="checkbox" id="meta-hide-resp"> HIDE Response (TEST)</label>
+                            <span class="helper-text">Student must type without seeing answer.</span>
+                        </div>
+                    </fieldset>
+
+                    <!-- BOX 2: AUDIO BEHAVIOR -->
+                    <fieldset>
+                        <legend>2. Audio Behavior</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-imprint"> Auto-Play (Imprint)</label>
+                            <span class="helper-text">Plays immediately on new card.</span>
+                            
+                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-drill"> Auto-Play (Drills)</label>
+                            <span class="helper-text">Plays audio during exercises.</span>
+                        </div>
+                    </fieldset>
+
+                    <!-- BOX 3: ENGINE TUNING -->
+                    <fieldset>
+                        <legend>3. Engine Tuning</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Mode</label>
+                            <span class="helper-text">Requires perfect spelling.</span>
+                            
+                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative Review</label>
+                            <span class="helper-text">Periodically review previous items.</span>
+                            
+                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Order</label>
+                            <span class="helper-text">Shuffle the sequence.</span>
+                            
+                            <div style="margin-top:0.5rem;">
+                                <label style="font-size:0.75rem;">Voice Threshold (0.1-1.0)</label>
+                                <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
+                                <span class="helper-text">0.1 = Forgiving | 1.0 = Strict</span>
+                            </div>
+                            <div style="margin-top:0.2rem;">
+                                <label style="font-size:0.75rem;">Review Interval</label>
+                                <input type="number" id="meta-interval" value="3">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- BOX 4: LOOP CONFIG -->
+                    <fieldset>
+                        <legend>4. Loop Config</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall</label>
                             <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-autoplay"> Auto-Play Trigger Audio</label>
                         </div>
-                    </div>
-                    
-                    <!-- COLUMN 3: ADVANCED -->
-                    <div class="col">
-                        <div class="subsection-title">ADVANCED</div>
-                        <div class="checkbox-group vertical">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Spelling</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Links</label>
-                        </div>
-                        <div style="margin-top:1rem;">
-                            <label>Cumulative Interval</label>
-                            <input type="number" id="meta-interval" value="3">
-                        </div>
-                    </div>
+                    </fieldset>
                 </div>
             </div>
         </div>
@@ -344,6 +374,8 @@
         <div class="page-header"><h1>📂 LOAD LESSON</h1></div>
         <div class="search-controls">
             <input type="text" id="lesson-search" class="search-box" placeholder="Search title...">
+            
+            <!-- RESTORED FULL LANGUAGE LISTS -->
             <select id="filter-native" class="filter-select">
                 <option value="">Native: Any</option>
                 <option value="en-US">English</option>
@@ -358,6 +390,7 @@
                 <option value="ja-JP">Japanese</option>
                 <option value="ar-EG">Arabic</option>
             </select>
+
             <select id="filter-target" class="filter-select">
                 <option value="">Target: Any</option>
                 <option value="en-US">English</option>
@@ -372,6 +405,7 @@
                 <option value="ja-JP">Japanese</option>
                 <option value="ar-EG">Arabic</option>
             </select>
+
             <select id="filter-level" class="filter-select">
                 <option value="">Level: Any</option>
                 <option value="A1.1">A1.1</option>
@@ -385,6 +419,7 @@
                 <option value="C1">C1</option>
                 <option value="C2">C2</option>
             </select>
+
             <button class="btn" onclick="searchLessons()">🔍 SEARCH</button>
         </div>
         <div id="lesson-grid" class="lesson-grid"></div>
@@ -405,11 +440,9 @@
     </div>
 </div>
 
-<!-- PRINT AREA & LOADER -->
 <div id="print-area"></div>
 <div id="overlay" class="hidden"><div class="loader"></div><h2 id="overlay-text">WORKING...</h2></div>
 
-<!-- BOTTOM ACTIONS -->
 <div class="bottom-bar">
     <button class="footer-btn" onclick="showPage('editor-page')">/// EDITOR ///</button>
     <button class="footer-btn-outline" onclick="showPage('browser-page')">📂 LOAD</button>
@@ -426,14 +459,12 @@
     let allLessons = [];
     let adminCode = localStorage.getItem('plde_admin_code');
 
-    // --- PAGE NAVIGATION ---
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         if (pageId === 'browser-page') document.getElementById('lesson-grid').innerHTML = '';
     }
 
-    // --- INITIAL LOAD ---
     window.onload = async function() { 
         if(!adminCode) {
             adminCode = prompt("🔐 ENTER ADMIN ACCESS CODE (Required for Private Lessons):");
@@ -550,7 +581,11 @@
         document.getElementById('meta-show-text').checked = true;
         document.getElementById('meta-show-trans').checked = false;
         document.getElementById('meta-show-phon').checked = false;
+        document.getElementById('meta-hide-resp').checked = false; 
         
+        document.getElementById('meta-autoplay-imprint').checked = false;
+        document.getElementById('meta-autoplay-drill').checked = false;
+
         document.getElementById('phase-recog').checked = true;
         document.getElementById('phase-audio-match').checked = false;
         document.getElementById('phase-reorder').checked = true;
@@ -558,7 +593,6 @@
         document.getElementById('phase-recall').checked = true;
         document.getElementById('phase-boss').checked = true;
         document.getElementById('phase-cumulative').checked = true;
-        document.getElementById('meta-autoplay').checked = false;
 
         if (type === 'standard') {
             document.getElementById('phase-audio-match').checked = true;
@@ -567,7 +601,7 @@
             document.getElementById('meta-show-text').checked = false; 
             document.getElementById('phase-audio-match').checked = true; 
             document.getElementById('phase-reorder').checked = false; 
-            document.getElementById('meta-autoplay').checked = true; 
+            document.getElementById('meta-autoplay-drill').checked = true; 
         }
         else if (type === 'reading') {
             document.getElementById('phase-audio-match').checked = false;
@@ -599,6 +633,12 @@
             document.getElementById('meta-show-text').checked = data.meta.show_text !== false; 
             document.getElementById('meta-show-trans').checked = !!data.meta.show_translation;
             document.getElementById('meta-show-phon').checked = !!data.meta.show_phonetic;
+            document.getElementById('meta-hide-resp').checked = !!data.meta.hide_imprint_response;
+
+            // BOX 2: AUDIO
+            document.getElementById('meta-autoplay-imprint').checked = !!data.meta.autoplay_imprint;
+            // Legacy mapping: audio_autoplay -> autoplay_drill
+            document.getElementById('meta-autoplay-drill').checked = !!data.meta.autoplay_drill || !!data.meta.audio_autoplay;
 
             // BOX 3: ENGINE
             document.getElementById('meta-strict').checked = data.meta.strict_mode !== false;
@@ -616,7 +656,6 @@
             document.getElementById('phase-prod').checked = p.production !== false; 
             document.getElementById('phase-recall').checked = p.recall !== false; 
             document.getElementById('phase-boss').checked = p.final_boss !== false; 
-            document.getElementById('meta-autoplay').checked = !!data.meta.audio_autoplay;
             
             // PRIVATE CHECKBOX
             document.getElementById('meta-private').checked = !!data.owner_code || !!data.meta.owner_code;
@@ -780,7 +819,6 @@ SCHEMA: {
                 cumulative: document.getElementById('phase-cumulative').checked
             };
 
-            // PRIVATE LESSON LOGIC
             const isPrivate = document.getElementById('meta-private').checked;
             const ownerCode = isPrivate ? adminCode : null;
 
@@ -790,7 +828,9 @@ SCHEMA: {
                 target_language: document.getElementById('meta-target').value,
                 level: document.getElementById('meta-level').value,
                 phases: phases,
-                audio_autoplay: document.getElementById('meta-autoplay').checked,
+                hide_imprint_response: document.getElementById('meta-hide-resp').checked,
+                autoplay_imprint: document.getElementById('meta-autoplay-imprint').checked,
+                autoplay_drill: document.getElementById('meta-autoplay-drill').checked,
                 show_text: document.getElementById('meta-show-text').checked,
                 show_translation: document.getElementById('meta-show-trans').checked,
                 show_phonetic: document.getElementById('meta-show-phon').checked,
@@ -818,8 +858,8 @@ SCHEMA: {
                 const uAudT = await handleUpload(c.querySelector('.f-t-aud'));
                 const uAudR = await handleUpload(c.querySelector('.f-r-aud'));
 
-                if (meta.audio_autoplay && !uAudT) {
-                    warnings.push(`Link #${i+1}: Auto-Play ON but no Trigger Audio (TTS will be used).`);
+                if ((meta.autoplay_imprint || meta.autoplay_drill) && !uAudT) {
+                    warnings.push(`Link #${i+1}: Auto-Play ON but no Audio.`);
                 }
 
                 const disStr = c.querySelector('.input-distractors').value;
@@ -856,7 +896,7 @@ SCHEMA: {
             }
 
             if (warnings.length > 0) {
-                if (!confirm("⚠️ AUDIO WARNINGS:\n" + warnings.join("\n") + "\n\nContinue?")) {
+                if (!confirm("⚠️ AUDIO MISSING:\n" + warnings.join("\n") + "\n\nContinue?")) {
                     overlay.classList.add('hidden');
                     return;
                 }
