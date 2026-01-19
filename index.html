@@ -184,6 +184,8 @@
 <div id="editor-page" class="page active">
     <div class="container">
         <h1>PLDE // LESSON MANAGER V11.1</h1>
+        <!-- ADMIN BUTTON (Hidden by default) -->
+            <button id="btn-users" class="btn-outline hidden" onclick="window.location.href='manager.html'">👥 USERS</button>
 
         <!-- Editing Mode Indicator -->
         <div id="edit-mode-container" class="edit-mode-container hidden">
@@ -458,6 +460,21 @@
     let currentEditId = null; 
     let allLessons = [];
     let adminCode = localStorage.getItem('plde_admin_code');
+    // --- ADMIN CHECK LOGIC ---
+    async function checkAdminRole() {
+        if(!adminCode || !client) return;
+        // Check the user_profiles table for role='admin'
+        const { data, error } = await client
+            .from('user_profiles')
+            .select('role')
+            .eq('code', adminCode)
+            .single();
+            
+        if(data && data.role === 'admin') {
+            const btn = document.getElementById('btn-users');
+            if(btn) btn.classList.remove('hidden');
+        }
+    }
 
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -472,6 +489,7 @@
         }
 
         if(client) await loadAllLessons();
+        await checkAdminRole(); // <--- ADD THIS LINE
         if (document.querySelectorAll('.card').length === 0) addLink();
     };
 
