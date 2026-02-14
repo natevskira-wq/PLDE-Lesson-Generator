@@ -270,10 +270,11 @@
                 </div>
 
                 <div class="settings-grid">
+                    <!-- BOX 1: DISPLAY -->
                     <fieldset>
                         <legend>1. Display</legend>
                         <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Text</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Trigger Text</label>
                             <span class="helper-text">Uncheck for Audio-Only drills.</span>
                             
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
@@ -288,34 +289,53 @@
                         </div>
                     </fieldset>
 
+                    <!-- BOX 2: AUDIO BEHAVIOR -->
                     <fieldset>
-                        <legend>2. Audio</legend>
+                        <legend>2. Audio Behavior</legend>
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-imprint"> Auto-Play (Imprint)</label>
+                            <span class="helper-text">Plays immediately on new card.</span>
+                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-drill"> Auto-Play (Drills)</label>
+                            <span class="helper-text">Plays audio during exercises.</span>
                         </div>
                     </fieldset>
 
+                    <!-- BOX 3: ENGINE TUNING -->
                     <fieldset>
-                        <legend>3. Engine</legend>
+                        <legend>3. Engine Tuning</legend>
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Mode</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative</label>
-                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize</label>
-                            <div style="margin-top:0.5rem;"><label style="font-size:0.7rem;">Voice Threshold</label><input type="number" id="meta-threshold" step="0.1" value="0.7"></div>
-                            <div style="margin-top:0.2rem;"><label style="font-size:0.7rem;">Interval</label><input type="number" id="meta-interval" value="3"></div>
+                            <span class="helper-text">Requires perfect spelling.</span>
+                            
+                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative Review</label>
+                            <span class="helper-text">Periodically review previous items.</span>
+                            
+                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Order</label>
+                            <span class="helper-text">Shuffle the sequence.</span>
+                            
+                            <div style="margin-top:0.5rem;">
+                                <label style="font-size:0.75rem;">Voice Threshold (0.1-1.0)</label>
+                                <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
+                                <span class="helper-text">0.1 = Forgiving | 1.0 = Strict</span>
+                            </div>
+                            <div style="margin-top:0.2rem;">
+                                <label style="font-size:0.75rem;">Review Interval</label>
+                                <input type="number" id="meta-interval" value="3">
+                            </div>
                         </div>
                     </fieldset>
 
+                    <!-- BOX 4: LOOP CONFIG -->
                     <fieldset>
-                        <legend>4. Loop</legend>
+                        <legend>4. Loop Config</legend>
                         <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Recognition</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Audio Match</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Reorder</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Production</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Recall</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Final Boss</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
                         </div>
                     </fieldset>
                 </div>
