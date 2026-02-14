@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLDE // LESSON MANAGER V11.1</title>
+    <title>PLDE // LESSON MANAGER V11.3</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -72,12 +72,8 @@
         
         /* DIRECTOR CONSOLE STYLES */
         .director-box {
-            background: #f0f0f0;
-            border: var(--border);
-            padding: 1.5rem;
-            margin-top: 0.5rem;
-            margin-bottom: 2rem;
-            position: relative;
+            background: #f4f4f4; border: var(--border); padding: 1.5rem; 
+            margin-top: 0.5rem; margin-bottom: 2rem; position: relative;
         }
         .director-box::before {
             content: "🎬";
@@ -90,7 +86,6 @@
             z-index: 10;
         }
         
-        /* 4-BOX LAYOUT RESTORED */
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
         
@@ -100,15 +95,9 @@
         .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; }
         .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; text-transform: none; font-weight: normal; }
         
-        /* HELPER TEXT RESTORED */
         .helper-text {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: -0.2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-            margin-left: 1.8rem; /* Align with checkbox text */
-            font-style: italic;
+            font-size: 0.75rem; color: #666; margin-top: -0.2rem; margin-bottom: 0.5rem;
+            display: block; margin-left: 1.8rem; font-style: italic;
         }
 
         .status-badge { display: inline-block; padding: 2px 5px; font-size: 0.8rem; border: 1px solid #ccc; margin-top: 5px; background: #fff; }
@@ -176,6 +165,23 @@
         .print-section { background: #f9f9f9; padding: 1.5rem; border: 2px solid var(--fg); }
         .print-buttons { display: flex; gap: 0.5rem; margin-top: 1rem; }
         .btn-print-outline { flex: 1; padding: 0.8rem; background: transparent; border: 2px solid var(--fg); font-weight: bold; cursor: pointer; }
+
+        /* V12 RESPONSIVE */
+        @media (max-width: 768px) {
+            .page { padding: 1rem; padding-bottom: 140px; }
+            h1 { font-size: 1.5rem; }
+            .row { flex-direction: column; gap: 0.8rem; }
+            .col { width: 100%; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .print-options-grid { grid-template-columns: 1fr !important; }
+            .bottom-bar { grid-template-columns: 1fr 1fr; }
+            input, select, .btn, .btn-outline { min-height: 48px; }
+            .checkbox-label { padding: 8px 0; }
+            .director-box::before { display: none; }
+            .director-box { padding: 1rem; }
+            .search-controls { grid-template-columns: 1fr; }
+            .lesson-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -183,35 +189,27 @@
 <!-- MAIN EDITOR PAGE -->
 <div id="editor-page" class="page active">
     <div class="container">
-        <h1>PLDE // LESSON MANAGER V11.1</h1>
-        <!-- ADMIN BUTTON (Visible by default) -->
-            <button id="btn-users" class="btn-outline" onclick="window.location.href='manager.html'">👥 USERS</button>
+        <header>
+            <h1>PLDE // EDITOR V11.3</h1>
+            <button id="btn-users" class="btn-outline hidden" onclick="window.location.href='manager.html'">👥 USERS</button>
+        </header>
 
         <!-- Editing Mode Indicator -->
-        <div id="edit-mode-container" class="edit-mode-container hidden">
-            <div style="color: green; font-weight: bold;">
-                ✏️ EDITING MODE ACTIVE
-            </div>
-            <button class="btn-clear" onclick="clearLoadedLesson()">CLEAR & RESET</button>
+        <div id="edit-mode-container" class="edit-mode-container hidden" style="background:#eaffea; padding:10px; border:1px solid green; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+            <div style="color: green; font-weight: bold;">✏️ EDITING EXISTING LESSON</div>
+            <button class="btn-delete" style="padding:5px 10px; font-size:0.8rem;" onclick="clearLoadedLesson()">EXIT EDIT MODE</button>
         </div>
 
         <!-- 0b. AI IMPORT STATION -->
         <div class="box-dashed ai-box">
-            <h3>🤖 AI Import Station</h3>
+            <h3>🤖 AI Import</h3>
             <div class="row">
-                <div class="col" style="flex: 0 0 150px;">
-                    <button class="btn-outline full-width" onclick="copyAiPrompt()">📋 Copy Prompt</button>
-                </div>
-                <div class="col">
-                    <textarea id="ai-input" rows="1" placeholder="Paste JSON from AI here..."></textarea>
-                </div>
-                <!-- CLEAR BUTTON -->
-                <div class="col" style="flex: 0 0 100px;">
-                    <button class="btn-outline full-width" onclick="clearAiInput()">🧹 CLEAR</button>
-                </div>
-                <div class="col" style="flex: 0 0 100px;">
-                    <button class="btn full-width" onclick="importJson()">⚡ PARSE</button>
-                </div>
+                <div class="col"><button class="btn-outline full-width" onclick="copyAiPrompt()">📋 Copy Prompt</button></div>
+                <div class="col" style="flex:2;"><textarea id="ai-input" rows="1" placeholder="Paste JSON here..."></textarea></div>
+            </div>
+            <div class="row">
+                <div class="col"><button class="btn-outline full-width" onclick="clearAiInput()">🧹 Clear</button></div>
+                <div class="col"><button class="btn full-width" onclick="importJson()">⚡ PARSE</button></div>
             </div>
         </div>
 
@@ -222,77 +220,60 @@
                     <label>Lesson Title</label>
                     <input type="text" id="meta-title" placeholder="e.g. Travel Basics">
                 </div>
-                <!-- NEW: PRIVATE TOGGLE -->
-                <div class="col" style="display:flex; align-items:flex-end; padding-bottom:1rem;">
-                    <label class="checkbox-label" style="background:#eee; padding:0.5rem; border:2px solid var(--fg); width:100%; justify-content:center;">
-                        <input type="checkbox" id="meta-private" checked> 🔒 MAKE PRIVATE
+                <!-- V11.3 SEQUENCE INPUT -->
+                <div class="col" style="flex: 1;">
+                    <label>Sort Order</label>
+                    <input type="number" id="meta-sequence" placeholder="999" value="999">
+                </div>
+                <div class="col">
+                    <label style="opacity:0">Private</label>
+                    <label class="checkbox-label" style="background:#eee; padding:0.8rem; border:2px solid var(--fg); justify-content:center;">
+                        <input type="checkbox" id="meta-private" checked> 🔒 PRIVATE
                     </label>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <label>Native Language</label>
+                    <label>Native</label>
                     <select id="meta-native">
-                        <option value="en-US">English (en-US)</option>
-                        <option value="de-DE">German (de-DE)</option>
-                        <option value="es-ES">Spanish (es-ES)</option>
-                        <option value="fr-FR">French (fr-FR)</option>
-                        <option value="it-IT">Italian (it-IT)</option>
-                        <option value="pt-BR">Portuguese (pt-BR)</option>
-                        <option value="ru-RU">Russian (ru-RU)</option>
-                        <option value="zh-CN">Chinese (zh-CN)</option>
-                        <option value="ko-KR">Korean (ko-KR)</option>
-                        <option value="ja-JP">Japanese (ja-JP)</option>
-                        <option value="ar-EG">Arabic (ar-EG)</option>
+                        <option value="en-US">English</option><option value="de-DE">German</option><option value="es-ES">Spanish</option>
+                        <option value="fr-FR">French</option><option value="it-IT">Italian</option><option value="ru-RU">Russian</option>
+                        <option value="zh-CN">Chinese</option><option value="ko-KR">Korean</option><option value="ja-JP">Japanese</option><option value="ar-EG">Arabic</option>
                     </select>
                 </div>
                 <div class="col">
-                    <label>Target Language</label>
+                    <label>Target</label>
                     <select id="meta-target">
-                        <option value="en-US">English (en-US)</option>
-                        <option value="de-DE">German (de-DE)</option>
-                        <option value="es-ES">Spanish (es-ES)</option>
-                        <option value="fr-FR">French (fr-FR)</option>
-                        <option value="it-IT">Italian (it-IT)</option>
-                        <option value="pt-BR">Portuguese (pt-BR)</option>
-                        <option value="ru-RU">Russian (ru-RU)</option>
-                        <option value="zh-CN">Chinese (zh-CN)</option>
-                        <option value="ko-KR">Korean (ko-KR)</option>
-                        <option value="ja-JP">Japanese (ja-JP)</option>
-                        <option value="ar-EG">Arabic (ar-EG)</option>
+                        <option value="en-US">English</option><option value="de-DE">German</option><option value="es-ES">Spanish</option>
+                        <option value="fr-FR">French</option><option value="it-IT">Italian</option><option value="ru-RU">Russian</option>
+                        <option value="zh-CN">Chinese</option><option value="ko-KR">Korean</option><option value="ja-JP">Japanese</option><option value="ar-EG">Arabic</option>
                     </select>
                 </div>
                 <div class="col">
                     <label>Level</label>
                     <select id="meta-level">
-                        <option value="A1.1">A1.1</option><option value="A1.2">A1.2</option>
-                        <option value="A2.1">A2.1</option><option value="A2.2">A2.2</option>
-                        <option value="B1.1">B1.1</option><option value="B1.2">B1.2</option>
-                        <option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
+                        <option value="A1.1">A1.1</option><option value="A1.2">A1.2</option><option value="A2.1">A2.1</option><option value="A2.2">A2.2</option>
+                        <option value="B1.1">B1.1</option><option value="B1.2">B1.2</option><option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
                         <option value="C1">C1</option><option value="C2">C2</option>
                     </select>
                 </div>
             </div>
 
-            <!-- TOGGLE BUTTON -->
-            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONTROLS & AI SETTINGS (Toggle)</button>
+            <button class="btn-toggle" onclick="toggleId('director-console')">▼ 🎬 DIRECTOR CONSOLE (SETTINGS)</button>
 
-            <!-- DIRECTOR CONSOLE V11 (RESTORED 4-BOX LAYOUT) -->
             <div id="director-console" class="director-box hidden">
-                <!-- PRESETS ROW -->
-                <div class="preset-row">
-                    <span style="font-weight:bold; font-size:0.8rem; margin-right:10px;">QUICK PRESETS:</span>
-                    <button class="btn-preset" onclick="applyPreset('standard')">Standard</button>
-                    <button class="btn-preset" onclick="applyPreset('audio')">Audio Drill</button>
-                    <button class="btn-preset" onclick="applyPreset('reading')">Reading Only</button>
+                <div style="margin-bottom:1rem; border-bottom:1px dashed #ccc; padding-bottom:0.5rem; display:flex; gap:0.5rem; overflow-x:auto;">
+                    <span style="font-weight:bold; font-size:0.8rem; align-self:center;">PRESETS:</span>
+                    <button style="font-size:0.7rem; padding:0.4rem;" onclick="applyPreset('standard')">STANDARD</button>
+                    <button style="font-size:0.7rem; padding:0.4rem;" onclick="applyPreset('audio')">AUDIO</button>
+                    <button style="font-size:0.7rem; padding:0.4rem;" onclick="applyPreset('reading')">READING</button>
                 </div>
 
                 <div class="settings-grid">
-                    <!-- BOX 1: DISPLAY -->
                     <fieldset>
                         <legend>1. Display</legend>
                         <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Trigger Text</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-show-text" checked> Show Text</label>
                             <span class="helper-text">Uncheck for Audio-Only drills.</span>
                             
                             <label class="checkbox-label"><input type="checkbox" id="meta-show-trans"> Show Translation</label>
@@ -307,53 +288,34 @@
                         </div>
                     </fieldset>
 
-                    <!-- BOX 2: AUDIO BEHAVIOR -->
                     <fieldset>
-                        <legend>2. Audio Behavior</legend>
+                        <legend>2. Audio</legend>
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-imprint"> Auto-Play (Imprint)</label>
-                            <span class="helper-text">Plays immediately on new card.</span>
-                            
                             <label class="checkbox-label"><input type="checkbox" id="meta-autoplay-drill"> Auto-Play (Drills)</label>
-                            <span class="helper-text">Plays audio during exercises.</span>
                         </div>
                     </fieldset>
 
-                    <!-- BOX 3: ENGINE TUNING -->
                     <fieldset>
-                        <legend>3. Engine Tuning</legend>
+                        <legend>3. Engine</legend>
                         <div class="checkbox-group">
                             <label class="checkbox-label"><input type="checkbox" id="meta-strict" checked> Strict Mode</label>
-                            <span class="helper-text">Requires perfect spelling.</span>
-                            
-                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative Review</label>
-                            <span class="helper-text">Periodically review previous items.</span>
-                            
-                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize Order</label>
-                            <span class="helper-text">Shuffle the sequence.</span>
-                            
-                            <div style="margin-top:0.5rem;">
-                                <label style="font-size:0.75rem;">Voice Threshold (0.1-1.0)</label>
-                                <input type="number" id="meta-threshold" step="0.1" min="0.1" max="1.0" value="0.7">
-                                <span class="helper-text">0.1 = Forgiving | 1.0 = Strict</span>
-                            </div>
-                            <div style="margin-top:0.2rem;">
-                                <label style="font-size:0.75rem;">Review Interval</label>
-                                <input type="number" id="meta-interval" value="3">
-                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-cumulative" checked> Cumulative</label>
+                            <label class="checkbox-label"><input type="checkbox" id="meta-random"> Randomize</label>
+                            <div style="margin-top:0.5rem;"><label style="font-size:0.7rem;">Voice Threshold</label><input type="number" id="meta-threshold" step="0.1" value="0.7"></div>
+                            <div style="margin-top:0.2rem;"><label style="font-size:0.7rem;">Interval</label><input type="number" id="meta-interval" value="3"></div>
                         </div>
                     </fieldset>
 
-                    <!-- BOX 4: LOOP CONFIG -->
                     <fieldset>
-                        <legend>4. Loop Config</legend>
+                        <legend>4. Loop</legend>
                         <div class="checkbox-group">
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Enable Recognition</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Enable Audio Match</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Enable Reorder</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Enable Production</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Enable Recall</label>
-                            <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Enable Final Boss</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recog" checked> Recognition</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-audio-match"> Audio Match</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-reorder" checked> Reorder</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-prod" checked> Production</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-recall" checked> Recall</label>
+                            <label class="checkbox-label"><input type="checkbox" id="phase-boss" checked> Final Boss</label>
                         </div>
                     </fieldset>
                 </div>
@@ -365,74 +327,50 @@
         <!-- 2. BUILDER -->
         <div id="links-container"></div>
         <div style="text-align: center; margin-bottom: 4rem;">
-            <button class="btn-outline full-width" onclick="addLink()">[ + ADD NEW LINK ]</button>
+            <button class="btn-outline full-width" onclick="addLink()">[ + ADD LINK ]</button>
         </div>
     </div>
 </div>
 
-<!-- LESSON BROWSER PAGE -->
+<!-- LESSON BROWSER -->
 <div id="browser-page" class="page">
     <div class="container lesson-browser-page">
-        <div class="page-header"><h1>📂 LOAD LESSON</h1></div>
-        <div class="search-controls">
+        <header><h1>📂 BROWSE</h1></header>
+        <div class="search-controls" style="display:grid; gap:1rem;">
             <input type="text" id="lesson-search" class="search-box" placeholder="Search title...">
-            
-            <!-- RESTORED FULL LANGUAGE LISTS -->
-            <select id="filter-native" class="filter-select">
-                <option value="">Native: Any</option>
-                <option value="en-US">English</option>
-                <option value="de-DE">German</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-BR">Portuguese</option>
-                <option value="ru-RU">Russian</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="ar-EG">Arabic</option>
-            </select>
-
-            <select id="filter-target" class="filter-select">
-                <option value="">Target: Any</option>
-                <option value="en-US">English</option>
-                <option value="de-DE">German</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-BR">Portuguese</option>
-                <option value="ru-RU">Russian</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="ar-EG">Arabic</option>
-            </select>
-
+            <div class="row" style="margin:0;">
+                <select id="filter-native" class="filter-select">
+                    <option value="">Native: Any</option>
+                    <option value="en-US">English</option><option value="de-DE">German</option><option value="es-ES">Spanish</option>
+                    <option value="fr-FR">French</option><option value="it-IT">Italian</option><option value="pt-BR">Portuguese</option>
+                    <option value="ru-RU">Russian</option><option value="zh-CN">Chinese</option><option value="ko-KR">Korean</option>
+                    <option value="ja-JP">Japanese</option><option value="ar-EG">Arabic</option>
+                </select>
+                <select id="filter-target" class="filter-select">
+                    <option value="">Target: Any</option>
+                    <option value="en-US">English</option><option value="de-DE">German</option><option value="es-ES">Spanish</option>
+                    <option value="fr-FR">French</option><option value="it-IT">Italian</option><option value="pt-BR">Portuguese</option>
+                    <option value="ru-RU">Russian</option><option value="zh-CN">Chinese</option><option value="ko-KR">Korean</option>
+                    <option value="ja-JP">Japanese</option><option value="ar-EG">Arabic</option>
+                </select>
+            </div>
             <select id="filter-level" class="filter-select">
                 <option value="">Level: Any</option>
-                <option value="A1.1">A1.1</option>
-                <option value="A1.2">A1.2</option>
-                <option value="A2.1">A2.1</option>
-                <option value="A2.2">A2.2</option>
-                <option value="B1.1">B1.1</option>
-                <option value="B1.2">B1.2</option>
-                <option value="B2.1">B2.1</option>
-                <option value="B2.2">B2.2</option>
-                <option value="C1">C1</option>
-                <option value="C2">C2</option>
+                <option value="A1.1">A1.1</option><option value="A1.2">A1.2</option><option value="A2.1">A2.1</option><option value="A2.2">A2.2</option>
+                <option value="B1.1">B1.1</option><option value="B1.2">B1.2</option><option value="B2.1">B2.1</option><option value="B2.2">B2.2</option>
+                <option value="C1">C1</option><option value="C2">C2</option>
             </select>
-
             <button class="btn" onclick="searchLessons()">🔍 SEARCH</button>
         </div>
-        <div id="lesson-grid" class="lesson-grid"></div>
-        <div id="no-lessons-message" class="no-results" style="text-align:center;">No lessons loaded. Click Search.</div>
+        <div id="lesson-grid" class="lesson-grid" style="margin-top:2rem;"></div>
+        <div id="no-lessons-message" style="text-align:center; margin-top:2rem; color:#666;">No lessons loaded. Click Search.</div>
     </div>
 </div>
 
 <!-- PRINT PAGE -->
 <div id="print-page" class="page">
     <div class="container print-page">
-        <div class="page-header"><h1>🖨️ PRINT LESSON</h1></div>
+        <header><h1>🖨️ PRINT</h1></header>
         <div class="print-options-grid">
             <div class="print-section"><h3>Part A: Match</h3><div class="print-buttons"><button class="btn-print-outline" onclick="printPartA(false)">Test</button><button class="btn-print-outline" onclick="printPartA(true)">Key</button></div></div>
             <div class="print-section"><h3>Part B: Unscramble</h3><div class="print-buttons"><button class="btn-print-outline" onclick="printPartB(false)">Test</button><button class="btn-print-outline" onclick="printPartB(true)">Key</button></div></div>
@@ -446,10 +384,10 @@
 <div id="overlay" class="hidden"><div class="loader"></div><h2 id="overlay-text">WORKING...</h2></div>
 
 <div class="bottom-bar">
-    <button class="footer-btn" onclick="showPage('editor-page')">/// EDITOR ///</button>
-    <button class="footer-btn-outline" onclick="showPage('browser-page')">📂 LOAD</button>
-    <button class="footer-btn-outline" onclick="showPage('print-page')">🖨️ PRINT</button>
-    <button class="footer-btn" id="publish-btn" onclick="publishLesson()">/// PUBLISH ///</button>
+    <button class="footer-btn" onclick="showPage('editor-page')">EDITOR</button>
+    <button class="footer-btn-outline" onclick="showPage('browser-page')">BROWSE</button>
+    <button class="footer-btn-outline" onclick="showPage('print-page')">PRINT</button>
+    <button class="footer-btn" id="publish-btn" onclick="publishLesson()">PUBLISH</button>
 </div>
 
 <script>
@@ -460,21 +398,6 @@
     let currentEditId = null; 
     let allLessons = [];
     let adminCode = localStorage.getItem('plde_admin_code');
-    // --- ADMIN CHECK LOGIC ---
-    async function checkAdminRole() {
-        if(!adminCode || !client) return;
-        // Check the user_profiles table for role='admin'
-        const { data, error } = await client
-            .from('user_profiles')
-            .select('role')
-            .eq('code', adminCode)
-            .single();
-            
-        if(data && data.role === 'admin') {
-            const btn = document.getElementById('btn-users');
-            if(btn) btn.classList.remove('hidden');
-        }
-    }
 
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -482,18 +405,52 @@
         if (pageId === 'browser-page') document.getElementById('lesson-grid').innerHTML = '';
     }
 
+    // --- CHECK ADMIN ROLE ---
+    async function checkAdminRole() {
+        if(!adminCode || !client) return;
+        const { data, error } = await client.from('user_profiles').select('role').eq('code', adminCode).single();
+        if(data && data.role === 'admin') {
+            document.getElementById('btn-users').classList.remove('hidden');
+        }
+    }
+
     window.onload = async function() { 
         if(!adminCode) {
-            adminCode = prompt("🔐 ENTER ADMIN ACCESS CODE (Required for Private Lessons):");
+            adminCode = prompt("🔐 ENTER ADMIN ACCESS CODE:");
             if(adminCode) localStorage.setItem('plde_admin_code', adminCode);
         }
-
-        if(client) await loadAllLessons();
-        await checkAdminRole(); // <--- ADD THIS LINE
+        
+        if(client) {
+            await loadAllLessons(); // Preload for search
+            await checkAdminRole(); // Show User Manager if Admin
+        }
+        
         if (document.querySelectorAll('.card').length === 0) addLink();
+        
+        // Setup Quick Search Listener
+        document.getElementById('quick-search').addEventListener('input', filterQuickSearch);
     };
 
-    // --- LESSON BROWSER LOGIC ---
+    // --- QUICK SEARCH (EDITOR PAGE) ---
+    function filterQuickSearch(e) {
+        const val = e.target.value.toLowerCase();
+        const list = document.getElementById('quick-results');
+        list.innerHTML = '';
+        if(val.length < 1) { list.classList.add('hidden'); return; }
+        const matches = allLessons.filter(l => l.title.toLowerCase().includes(val)).slice(0, 8);
+        if(matches.length > 0) {
+            list.classList.remove('hidden');
+            matches.forEach(l => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.innerHTML = `<div><strong>${l.title}</strong><span>${l.native.split('-')[1]} → ${l.target.split('-')[1]} | ${l.level}</span></div>`;
+                item.onclick = () => { loadLessonFromCard(l.id); list.classList.add('hidden'); document.getElementById('quick-search').value = ''; };
+                list.appendChild(item);
+            });
+        } else { list.classList.add('hidden'); }
+    }
+
+    // --- BROWSER LOGIC ---
     async function loadAllLessons() {
         try {
             const { data, error } = await client.from('lessons').select('id, title, created_at, content').order('created_at', { ascending: false });
@@ -526,58 +483,51 @@
         
         const grid = document.getElementById('lesson-grid');
         grid.innerHTML = '';
-        if (filtered.length === 0) { grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center;">No lessons found.</div>'; return; }
-
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        if (filtered.length === 0) { document.getElementById('no-lessons-message').innerText = "No matches found."; return; }
+        document.getElementById('no-lessons-message').innerText = "";
 
         filtered.forEach(l => {
             const card = document.createElement('div');
             card.className = 'lesson-card';
             card.innerHTML = `
-                <div class="lesson-language">${l.native.split('-')[1]} → ${l.target.split('-')[1]}</div>
-                <div class="lesson-meta">${l.level}</div>
+                <div style="font-size:1.2rem; font-weight:bold;">${l.native.split('-')[1]} → ${l.target.split('-')[1]}</div>
+                <div style="font-size:0.8rem; color:#666; margin-bottom:0.5rem;">${l.level}</div>
                 <div style="font-weight:bold; margin-bottom:0.5rem;">${l.title}</div>
-                <div class="lesson-actions">
-                    <button class="btn-edit" onclick="loadLessonFromCard('${l.id}')">✏️ EDIT</button>
-                    <button class="btn-delete-card" onclick="deleteLesson('${l.id}')">🗑️</button>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn" style="flex:1; padding:0.5rem;" onclick="loadLessonFromCard('${l.id}')">EDIT</button>
+                    <button class="btn-delete" style="padding:0.5rem;" onclick="deleteLesson('${l.id}')">🗑️</button>
                 </div>
             `;
             grid.appendChild(card);
         });
     }
 
+    // --- COMMON LOAD LOGIC ---
     async function loadLessonFromCard(id) {
         const overlay = document.getElementById('overlay');
         overlay.classList.remove('hidden');
         try {
             const { data, error } = await client.from('lessons').select('*').eq('id', id).single();
             if(error) throw error;
-
             currentEditId = data.id;
             document.getElementById('edit-mode-container').classList.remove('hidden');
             document.getElementById('publish-btn').innerText = "/// UPDATE ///";
-
+            
+            // Populating Form
             populateFormFromData(data.content);
-            document.getElementById('meta-title').value = data.title; 
+            document.getElementById('meta-title').value = data.title;
+            // V11.3 - Load Sequence (Default 999 if null)
+            document.getElementById('meta-sequence').value = data.sequence || 999;
+            
             showPage('editor-page');
             window.scrollTo(0,0);
         } catch(e) { alert(e.message); } finally { overlay.classList.add('hidden'); }
     }
 
     async function deleteLesson(id) {
-        if(!confirm("⚠️ PERMANENTLY DELETE LESSON?")) return;
-        const overlay = document.getElementById('overlay');
-        overlay.classList.remove('hidden');
-        document.getElementById('overlay-text').innerText = "DELETING...";
+        if(!confirm("⚠️ DELETE?")) return;
         const { error } = await client.from('lessons').delete().eq('id', id);
-        overlay.classList.add('hidden');
-        if(error) alert("Error: " + error.message);
-        else {
-            alert("Deleted.");
-            await loadAllLessons();
-            searchLessons();
-            if(currentEditId === id) clearLoadedLesson();
-        }
+        if(!error) { alert("Deleted."); await loadAllLessons(); searchLessons(); }
     }
 
     function clearLoadedLesson() {
@@ -586,6 +536,7 @@
             document.getElementById('edit-mode-container').classList.add('hidden');
             document.getElementById('publish-btn').innerText = "/// PUBLISH ///";
             document.getElementById('meta-title').value = '';
+            document.getElementById('meta-sequence').value = '999'; // Reset sequence
             document.getElementById('links-container').innerHTML = '';
             addLink();
         }
@@ -655,7 +606,6 @@
 
             // BOX 2: AUDIO
             document.getElementById('meta-autoplay-imprint').checked = !!data.meta.autoplay_imprint;
-            // Legacy mapping: audio_autoplay -> autoplay_drill
             document.getElementById('meta-autoplay-drill').checked = !!data.meta.autoplay_drill || !!data.meta.audio_autoplay;
 
             // BOX 3: ENGINE
@@ -663,7 +613,7 @@
             document.getElementById('meta-random').checked = !!data.meta.randomize;
             document.getElementById('meta-threshold').value = data.meta.voice_threshold || 0.7;
             document.getElementById('meta-interval').value = data.meta.cumulative_interval || 3;
-            // Loop config might store cumulative in phases or top level, default true
+            // Loop config
             const p = data.meta.phases || {};
             document.getElementById('phase-cumulative').checked = p.cumulative !== false;
 
@@ -920,8 +870,10 @@ SCHEMA: {
                 }
             }
 
+            // V11.3: Include Sequence in payload
+            const seq = parseInt(document.getElementById('meta-sequence').value) || 999;
             const json = { lesson_id: currentEditId ? `updated_${Date.now()}` : `${meta.target_language}-${meta.level}-${Date.now()}`, meta, links };
-            const payload = { title: meta.title, content: json, owner_code: ownerCode };
+            const payload = { title: meta.title, content: json, owner_code: ownerCode, sequence: seq };
 
             if(currentEditId) {
                 const { error } = await client.from('lessons').update(payload).eq('id', currentEditId);
